@@ -1,5 +1,5 @@
 $SCRIPTPATH = "C:\Users\RichardSlater\Documents\WindowsPowerShell\bin"
-$VIMPATH    = $SCRIPTSPATH + "\vim.exe"
+$VIMPATH    = $SCRIPTPATH + "\vim.exe"
 
 Set-Alias vi   $VIMPATH
 Set-Alias vim  $VIMPATH
