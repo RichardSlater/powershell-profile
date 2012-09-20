@@ -2224,6 +2224,9 @@ au BufNewFile,BufRead *.xsl,*.xslt		setf xslt
 " Yacc
 au BufNewFile,BufRead *.yy			setf yacc
 
+" PowerShell
+au BufNewFile,BufRead *.ps1,*.psc1 		setf ps1
+
 " Yacc or racc
 au BufNewFile,BufRead *.y			call s:FTy()
 
