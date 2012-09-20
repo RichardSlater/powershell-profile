@@ -1,5 +1,6 @@
-$SCRIPTPATH = ".\bin"
-$VIMPATH    = $SCRIPTPATH + "\vim\vim.exe"
+$PROFILEPATH = Split-Path $profile
+$SCRIPTPATH  = Join-Path $PROFILEPATH bin
+$VIMPATH     = Join-Path $SCRIPTPATH "\vim\vim.exe"
 
 Set-Alias vi   $VIMPATH
 Set-Alias vim  $VIMPATH
