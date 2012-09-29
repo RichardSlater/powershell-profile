@@ -16,3 +16,13 @@ Function Edit-Vimrc
 {
     vim $home\_vimrc
 }
+
+# for configuring git with suitable settings
+Function Configure-Git
+{
+    git config --global user.name "Richard Slater"
+    git config --global user.email git@richard-slater.co.uk
+    git config --global core.editor vim
+    git config --global color.ui true
+    git config --global core.autocrlf true
+}
