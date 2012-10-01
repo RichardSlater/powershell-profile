@@ -5,6 +5,9 @@ $VimPath     = Join-Path $ScriptPath "\vim\vim.exe"
 Set-Alias vi   $VimPath
 Set-Alias vim  $VimPath
 
+# for AutoLoading script modules
+Get-Module -ListAvailable | ? { $_.ModuleType -eq "Script" } | Import-Module
+
 # for editing your PowerShell profile
 Function Edit-Profile
 {
@@ -25,4 +28,16 @@ Function Configure-Git
     git config --global core.editor vim
     git config --global color.ui true
     git config --global core.autocrlf true
+}
+
+# for finding files, UNIX like
+Function which($name)
+{
+    Get-Command $name | Select-Object Definition
+}
+
+# for creating empty files, UNIX like
+Function touch($file)
+{
+    "" | Out-File $file -Encoding ASCII
 }
