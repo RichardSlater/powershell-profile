@@ -1,9 +1,9 @@
-$PROFILEPATH = Split-Path $profile
-$SCRIPTPATH  = Join-Path $PROFILEPATH bin
-$VIMPATH     = Join-Path $SCRIPTPATH "\vim\vim.exe"
+$ProfilePath = Split-Path $profile
+$ScriptPath  = Join-Path $ProfilePath bin
+$VimPath     = Join-Path $ScriptPath "\vim\vim.exe"
 
-Set-Alias vi   $VIMPATH
-Set-Alias vim  $VIMPATH
+Set-Alias vi   $VimPath
+Set-Alias vim  $VimPath
 
 # for editing your PowerShell profile
 Function Edit-Profile
