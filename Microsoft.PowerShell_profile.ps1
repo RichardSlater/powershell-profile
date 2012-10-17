@@ -20,6 +20,16 @@ Function Edit-Vimrc
     vim $home\_vimrc
 }
 
+# for configuring git at Amido with suitable settings
+Function Configure-GitAmido
+{
+    git config --global user.name "Richard Slater"
+    git config --global user.email richard.slater@amido.co.uk
+    git config --global core.editor vim
+    git config --global color.ui true
+    git config --global core.autocrlf true
+}
+
 # for configuring git with suitable settings
 Function Configure-Git
 {
