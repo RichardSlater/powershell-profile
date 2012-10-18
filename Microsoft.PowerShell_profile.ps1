@@ -40,6 +40,14 @@ Function Configure-Git
     git config --global core.autocrlf true
 }
 
+Function Goto-Source
+{
+    if (Test-Path C:\Source)
+    {
+        cd C:\Source
+    }
+}
+
 # for finding files, UNIX like
 Function which($name)
 {
