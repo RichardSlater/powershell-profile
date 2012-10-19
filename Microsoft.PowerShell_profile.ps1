@@ -1,6 +1,7 @@
 $ProfilePath = Split-Path $profile
 $ScriptPath  = Join-Path $ProfilePath bin
 $VimPath     = Join-Path $ScriptPath "\vim\vim.exe"
+$SublimePath = "C:\Program Files\Sublime Text 2\sublime_text.exe"
 
 Set-Alias vi   $VimPath
 Set-Alias vim  $VimPath
