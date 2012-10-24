@@ -79,6 +79,9 @@ ipch/
 # ReSharper is a .NET coding add-in
 _ReSharper*
 
+# TeamCity is a CI build monitor
+_TeamCity*
+
 # Installshield output folder
 [Ee]xpress
 
