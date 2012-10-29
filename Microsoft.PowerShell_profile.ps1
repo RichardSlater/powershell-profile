@@ -78,3 +78,25 @@ Function Init-VSEnvironment()
   popd
   Write-Host "`nVisual Studio 2009 Command Prompt variables set." -ForegroundColor Yellow
 }
+
+
+function Import-PfxCertificate 
+{
+  param(
+    [String]$certPath,
+    [String]$certRootStore = “CurrentUser”,
+    [String]$certStore = “My”,
+    $pfxPass = $null
+  )
+
+  $pfx = New-Object System.Security.Cryptography.X509Certificates.X509Certificate2    
+
+  if ($pfxPass -eq $null) { $pfxPass = Read-Host “Enter the pfx password” -AsSecureString }
+  
+  $pfx.import((Resolve-Path $certPath), $pfxPass, “Exportable,PersistKeySet”)    
+  
+  $store = new-object System.Security.Cryptography.X509Certificates.X509Store($certStore,$certRootStore)    
+  $store.open(“MaxAllowed”)    
+  $store.add($pfx)    
+  $store.close()    
+}  
