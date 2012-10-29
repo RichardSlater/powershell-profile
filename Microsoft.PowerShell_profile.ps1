@@ -41,3 +41,17 @@ Function touch($file)
 {
     "" | Out-File $file -Encoding ASCII
 }
+
+Function Init-VSEnvironment()
+{
+  #Set environment variables for Visual Studio Command Prompt
+  pushd 'C:\Program Files (x86)\Microsoft Visual Studio 10.0\vc'
+  cmd /c “vcvarsall.bat&set” |
+  foreach {
+    if ($_ -match “=”) {
+      $v = $_.split(“=”); set-item -force -path "ENV:\$($v[0])"  -value "$($v[1])"
+    }
+  }
+  popd
+  Write-Host "`nVisual Studio 2009 Command Prompt variables set." -ForegroundColor Yellow
+}
