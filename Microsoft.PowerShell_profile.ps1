@@ -1,6 +1,7 @@
 $ProfilePath = Split-Path $profile
 $ScriptPath  = Join-Path $ProfilePath bin
 $VimPath     = Join-Path $ScriptPath "\vim\vim.exe"
+$SublimePath = "C:\Program Files\Sublime Text 2\sublime_text.exe"
 
 Set-Alias vi   $VimPath
 Set-Alias vim  $VimPath
@@ -20,14 +21,36 @@ Function Edit-Vimrc
     vim $home\_vimrc
 }
 
-# for configuring git with suitable settings
-Function Configure-Git
+Function Configure-GitCore
 {
+    $gitIgnorePath = Join-Path $ProfilePath .gitignore
     git config --global user.name "Richard Slater"
-    git config --global user.email git@richard-slater.co.uk
     git config --global core.editor vim
     git config --global color.ui true
     git config --global core.autocrlf true
+    git config --global core.excludesfile $gitIgnorePath
+}
+
+# for configuring git at Amido with suitable settings
+Function Configure-GitAmido
+{
+    git config --global user.email richard.slater@amido.co.uk
+    Configure-GitCore
+}
+
+# for configuring git with suitable settings
+Function Configure-Git
+{
+    git config --global user.email git@richard-slater.co.uk
+    Configure-GitCore
+}
+
+Function Goto-Source
+{
+    if (Test-Path C:\Source)
+    {
+        cd C:\Source
+    }
 }
 
 # for finding files, UNIX like

@@ -5,7 +5,6 @@
 *.pydevproject
 .project
 .metadata
-bin/
 tmp/
 *.tmp
 *.bak
@@ -80,6 +79,9 @@ ipch/
 # ReSharper is a .NET coding add-in
 _ReSharper*
 
+# TeamCity is a CI build monitor
+_TeamCity*
+
 # Installshield output folder
 [Ee]xpress
 
@@ -140,7 +142,6 @@ dist
 build
 eggs
 parts
-bin
 var
 sdist
 develop-eggs
