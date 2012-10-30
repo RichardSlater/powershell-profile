@@ -45,6 +45,11 @@ Function Configure-Git
     Configure-GitCore
 }
 
+Function Visualize-Git
+{
+    git log --oneline --decorate --all --graph --simplify-by-decoration
+}
+
 Function Goto-Source
 {
     if (Test-Path C:\Source)
