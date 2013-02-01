@@ -2,9 +2,11 @@ $ProfilePath = Split-Path $profile
 $ScriptPath  = Join-Path $ProfilePath bin
 $VimPath     = Join-Path $ScriptPath "\vim\vim.exe"
 $SublimePath = "C:\Program Files\Sublime Text 2\sublime_text.exe"
+$DcrawPath   = Join-Path $ScriptPath "\dcraw\dcraw.exe"
 
-Set-Alias vi   $VimPath
-Set-Alias vim  $VimPath
+Set-Alias vi    $VimPath
+Set-Alias vim   $VimPath
+Set-Alias dcraw $DcrawPath
 
 # for AutoLoading script modules
 Get-Module -ListAvailable | ? { $_.ModuleType -eq "Script" } | Import-Module
