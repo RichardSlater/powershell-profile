@@ -3,10 +3,17 @@ $ScriptPath  = Join-Path $ProfilePath bin
 $VimPath     = Join-Path $ScriptPath "\vim\vim.exe"
 $SublimePath = "C:\Program Files\Sublime Text 2\sublime_text.exe"
 $DcrawPath   = Join-Path $ScriptPath "\dcraw\dcraw.exe"
+$CJpegRootPath   = Join-Path $ScriptPath "cjpeg"
+$cjpegPath = Join-Path $CJpegRootPath "\cjpeg\Release\cjpeg.exe"
+$djpegPath = Join-Path $CJpegRootPath "cjpeg\djpeg\Release\djpeg.exe"
+$cjpegTranPath = Join-Path $CJpegRootPath "cjpeg\jpegtran\Release\jpegtran.exe"
+$rdjpegcomPath = Join-Path $CJpegRootPath "cjpeg\rdjpgcom\Release\rdjpgcom.exe"
+$wrjpgcomPath = Join-Path $CJpegRootPath "wrjpgcom\Release\wrjpgcom.exe"
 
 Set-Alias vi    $VimPath
 Set-Alias vim   $VimPath
 Set-Alias dcraw $DcrawPath
+Set-Alias cjpeg $cjpegPath
 
 # for AutoLoading script modules
 Get-Module -ListAvailable | ? { $_.ModuleType -eq "Script" } | Import-Module
