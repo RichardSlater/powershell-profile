@@ -1,0 +1,1 @@
+markdown-1.2.2.vba: call delete('C:\Users\Richard\Documents\WindowsPowerShell\bin\vim/ftdetect/markdown.vim')|call delete('C:\Users\Richard\Documents\WindowsPowerShell\bin\vim/snippets/markdown.snippets')|call delete('C:\Users\Richard\Documents\WindowsPowerShell\bin\vim/syntax/markdown.vim')

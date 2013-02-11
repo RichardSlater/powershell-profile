@@ -29,6 +29,8 @@ Function Configure-GitCore
     git config --global color.ui true
     git config --global core.autocrlf true
     git config --global core.excludesfile $gitIgnorePath
+    git config --global mergetool.vimdiff3.cmd 'vim -f -d -c "wincmd J" "$MERGED" "$LOCAL" "$BASE" "$REMOTE"'
+    git config --global merge.tool vimdiff3
 }
 
 # for configuring git at Amido with suitable settings
