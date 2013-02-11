@@ -1,0 +1,36 @@
+﻿Build started 2/1/2013 2:42:40 PM.
+     1>Project "C:\Users\Richard Slater\Documents\WindowsPowerShell\bin\cjpeg\djpeg.vcxproj" on node 5 (rebuild target(s)).
+     1>InitializeBuildStatus:
+         Creating "djpeg\Release\djpeg.unsuccessfulbuild" because "AlwaysCreate" was specified.
+       ClCompile:
+         c:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\bin\CL.exe /c /Zi /nologo /W3 /WX- /Ox /Oy /GT /GL /D WIN32 /D NDEBUG /D _CONSOLE /D _CRT_SECURE_NO_WARNINGS /Gm- /EHsc /MD /GS /Gy /fp:precise /Zc:wchar_t /Zc:forScope /Fo"djpeg\Release\\" /Fd"djpeg\Release\vc100.pdb" /Gd /TC /wd4996 /analyze- /errorReport:prompt cdjpeg.c djpeg.c rdcolmap.c wrbmp.c wrgif.c wrppm.c wrrle.c wrtarga.c
+         cdjpeg.c
+         djpeg.c
+         rdcolmap.c
+         wrbmp.c
+         wrgif.c
+         wrppm.c
+         wrrle.c
+         wrtarga.c
+       Link:
+         c:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"djpeg\Release\djpeg.exe" /INCREMENTAL:NO /NOLOGO Release\jpeg.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /ManifestFile:"djpeg\Release\djpeg.exe.intermediate.manifest" /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /DEBUG /PDB:"C:\Users\Richard Slater\Documents\WindowsPowerShell\bin\cjpeg\djpeg\Release\djpeg.pdb" /SUBSYSTEM:CONSOLE /OPT:REF /OPT:ICF /LTCG /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"djpeg\Release\djpeg.lib" /MACHINE:X86 djpeg\Release\cdjpeg.obj
+         djpeg\Release\djpeg.obj
+         djpeg\Release\rdcolmap.obj
+         djpeg\Release\wrbmp.obj
+         djpeg\Release\wrgif.obj
+         djpeg\Release\wrppm.obj
+         djpeg\Release\wrrle.obj
+         djpeg\Release\wrtarga.obj
+         Generating code
+         Finished generating code
+         djpeg.vcxproj -> C:\Users\Richard Slater\Documents\WindowsPowerShell\bin\cjpeg\djpeg\Release\djpeg.exe
+       Manifest:
+         c:\Program Files (x86)\Microsoft SDKs\Windows\v7.0A\bin\mt.exe /nologo /verbose /outputresource:"djpeg\Release\djpeg.exe;#1" /manifest djpeg\Release\djpeg.exe.intermediate.manifest
+       FinalizeBuildStatus:
+         Deleting file "djpeg\Release\djpeg.unsuccessfulbuild".
+         Touching "djpeg\Release\djpeg.lastbuildstate".
+     1>Done Building Project "C:\Users\Richard Slater\Documents\WindowsPowerShell\bin\cjpeg\djpeg.vcxproj" (rebuild target(s)).
+
+Build succeeded.
+
+Time Elapsed 00:00:02.62
