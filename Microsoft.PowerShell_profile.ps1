@@ -95,6 +95,15 @@ Function Initialize-VSEnvironment()
   Write-Host "`nVisual Studio 2012 Command Prompt variables set." -ForegroundColor Yellow
 }
 
+Function Initialize-Ruby()
+{
+  #Set environment variables for Visual Studio Command Prompt
+  pushd 'C:\Ruby193\bin'
+  ./setrbvars.bat
+  popd
+  Write-Host "`nRuby Environment Configured." -ForegroundColor Yellow
+}
+
 
 function Import-PfxCertificate 
 {
