@@ -81,7 +81,7 @@ Function touch($file)
     "" | Out-File $file -Encoding ASCII
 }
 
-Function Init-VSEnvironment()
+Function Initialize-VSEnvironment()
 {
   #Set environment variables for Visual Studio Command Prompt
   pushd 'C:\Program Files (x86)\Microsoft Visual Studio 10.0\vc'
@@ -92,7 +92,7 @@ Function Init-VSEnvironment()
     }
   }
   popd
-  Write-Host "`nVisual Studio 2009 Command Prompt variables set." -ForegroundColor Yellow
+  Write-Host "`nVisual Studio 2012 Command Prompt variables set." -ForegroundColor Yellow
 }
 
 
