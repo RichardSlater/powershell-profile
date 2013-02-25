@@ -127,3 +127,13 @@ function Import-PfxCertificate
   $store.add($pfx)    
   $store.close()    
 }  
+
+function Sync-GitFlowRepository
+{
+  git checkout master
+  git pull
+  git checkout support
+  git pull
+  git checkout develop
+  git pull
+}
