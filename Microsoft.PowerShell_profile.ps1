@@ -10,12 +10,14 @@ $djpegPath     = Join-Path $CJpegRootPath "cjpeg\djpeg\Release\djpeg.exe"
 $cjpegTranPath = Join-Path $CJpegRootPath "cjpeg\jpegtran\Release\jpegtran.exe"
 $rdjpegcomPath = Join-Path $CJpegRootPath "cjpeg\rdjpgcom\Release\rdjpgcom.exe"
 $wrjpgcomPath  = Join-Path $CJpegRootPath "wrjpgcom\Release\wrjpgcom.exe"
+$whoisPath     = Join-Path $ScriptPath "sysinternals\whois.exe"
 
 Set-Alias vi     $VimPath
 Set-Alias vim    $VimPath
 Set-Alias dcraw  $DcrawPath
 Set-Alias cjpeg  $cjpegPath
 Set-Alias gource $GourcePath
+Set-Alias whois  $whoisPath
 
 # for AutoLoading script modules
 Get-Module -ListAvailable | ? { $_.ModuleType -eq "Script" } | Import-Module
