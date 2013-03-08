@@ -88,11 +88,11 @@ Function touch($file)
 Function Initialize-VSEnvironment()
 {
   #Set environment variables for Visual Studio Command Prompt
-  pushd 'C:\Program Files (x86)\Microsoft Visual Studio 10.0\vc'
-  cmd /c “vcvarsall.bat&set” |
+  pushd "C:\Program Files (x86)\Microsoft Visual Studio 11.0\vc"
+  cmd /c "vcvarsall.bat & set" |
   foreach {
-    if ($_ -match “=”) {
-      $v = $_.split(“=”); set-item -force -path "ENV:\$($v[0])"  -value "$($v[1])"
+    if ($_ -match "=") {
+      $v = $_.split("="); set-item -force -path "ENV:\$($v[0])" -value "$($v[1])"
     }
   }
   popd
@@ -108,24 +108,23 @@ Function Initialize-Ruby()
   Write-Host "`nRuby Environment Configured." -ForegroundColor Yellow
 }
 
-
 function Import-PfxCertificate 
 {
   param(
     [String]$certPath,
-    [String]$certRootStore = “CurrentUser”,
-    [String]$certStore = “My”,
+    [String]$certRootStore = "CurrentUser",
+    [String]$certStore = "My",
     $pfxPass = $null
   )
 
   $pfx = New-Object System.Security.Cryptography.X509Certificates.X509Certificate2    
 
-  if ($pfxPass -eq $null) { $pfxPass = Read-Host “Enter the pfx password” -AsSecureString }
+  if ($pfxPass -eq $null) { $pfxPass = Read-Host "Enter the pfx password" -AsSecureString }
   
-  $pfx.import((Resolve-Path $certPath), $pfxPass, “Exportable,PersistKeySet”)    
+  $pfx.import((Resolve-Path $certPath), $pfxPass, "Exportable,PersistKeySet")    
   
   $store = new-object System.Security.Cryptography.X509Certificates.X509Store($certStore,$certRootStore)    
-  $store.open(“MaxAllowed”)    
+  $store.open("MaxAllowed")    
   $store.add($pfx)    
   $store.close()    
 }  
