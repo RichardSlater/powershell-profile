@@ -138,4 +138,5 @@ function Sync-GitFlowRepository
   git pull
   git checkout develop
   git pull
+  git remote prune origin
 }
