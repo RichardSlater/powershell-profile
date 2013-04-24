@@ -141,3 +141,9 @@ function Sync-GitFlowRepository
   git pull
   git remote prune origin
 }
+
+function Import-AzureModule
+{
+  $modulePath = 'C:\Program Files (x86)\Microsoft SDKs\Windows Azure\PowerShell\Azure'
+  Import-Module $modulePath
+}
