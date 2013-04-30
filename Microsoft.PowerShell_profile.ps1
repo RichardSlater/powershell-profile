@@ -104,7 +104,7 @@ Function Initialize-VSEnvironment()
 Function Initialize-Ruby()
 {
   #Set environment variables for Visual Studio Command Prompt
-  pushd 'C:\Ruby193\bin'
+  pushd 'C:\Ruby200-x64\bin'
   ./setrbvars.bat
   popd
   Write-Host "`nRuby Environment Configured." -ForegroundColor Yellow
