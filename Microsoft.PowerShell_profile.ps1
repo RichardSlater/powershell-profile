@@ -20,6 +20,7 @@ Set-Alias cjpeg      $cjpegPath
 Set-Alias gource     $GourcePath
 Set-Alias whois      $whoisPath
 Set-Alias logstalgia $logstalgiaPath
+Set-Alias sublime    $SublimePath
 
 # for AutoLoading script modules
 Get-Module -ListAvailable | ? { $_.ModuleType -eq "Script" } | Import-Module
@@ -46,6 +47,7 @@ Function Configure-GitCore
     git config --global core.excludesfile $gitIgnorePath
     git config --global mergetool.vimdiff3.cmd 'vim -f -d -c "wincmd J" "$MERGED" "$LOCAL" "$BASE" "$REMOTE"'
     git config --global merge.tool vimdiff3
+    git config --global branch.autosetupmerge true
 }
 
 # for configuring git at Amido with suitable settings
