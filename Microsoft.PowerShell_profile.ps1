@@ -12,6 +12,7 @@ $rdjpegcomPath  = Join-Path $CJpegRootPath "cjpeg\rdjpgcom\Release\rdjpgcom.exe"
 $wrjpgcomPath   = Join-Path $CJpegRootPath "wrjpgcom\Release\wrjpgcom.exe"
 $whoisPath      = Join-Path $ScriptPath "sysinternals\whois.exe"
 $logstalgiaPath = Join-Path $ScriptPath "logstalgia\logstalgia.exe"
+$curlPath       = Join-Path $ScriptPath "curl\curl.exe"
 
 Set-Alias vi         $VimPath
 Set-Alias vim        $VimPath
@@ -21,6 +22,7 @@ Set-Alias gource     $GourcePath
 Set-Alias whois      $whoisPath
 Set-Alias logstalgia $logstalgiaPath
 Set-Alias sublime    $SublimePath
+Set-Alias curl       $curlPath
 
 # for AutoLoading script modules
 Get-Module -ListAvailable | ? { $_.ModuleType -eq "Script" } | Import-Module
@@ -106,7 +108,7 @@ Function Initialize-VSEnvironment()
 Function Initialize-Ruby()
 {
   #Set environment variables for Visual Studio Command Prompt
-  pushd 'C:\Ruby193\bin'
+  pushd 'C:\Ruby200-x64\bin'
   ./setrbvars.bat
   popd
   Write-Host "`nRuby Environment Configured." -ForegroundColor Yellow
@@ -142,4 +144,10 @@ function Sync-GitFlowRepository
   git checkout develop
   git pull
   git remote prune origin
+}
+
+function Import-AzureModule
+{
+  $modulePath = 'C:\Program Files (x86)\Microsoft SDKs\Windows Azure\PowerShell\Azure'
+  Import-Module $modulePath
 }
