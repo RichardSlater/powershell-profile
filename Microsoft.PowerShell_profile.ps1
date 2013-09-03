@@ -12,7 +12,6 @@ $rdjpegcomPath  = Join-Path $CJpegRootPath "cjpeg\rdjpgcom\Release\rdjpgcom.exe"
 $wrjpgcomPath   = Join-Path $CJpegRootPath "wrjpgcom\Release\wrjpgcom.exe"
 $whoisPath      = Join-Path $ScriptPath "sysinternals\whois.exe"
 $logstalgiaPath = Join-Path $ScriptPath "logstalgia\logstalgia.exe"
-$curlPath       = Join-Path $ScriptPath "curl\curl.exe"
 
 Set-Alias vi         $VimPath
 Set-Alias vim        $VimPath
@@ -22,7 +21,6 @@ Set-Alias gource     $GourcePath
 Set-Alias whois      $whoisPath
 Set-Alias logstalgia $logstalgiaPath
 Set-Alias sublime    $SublimePath
-Set-Alias curl       $curlPath
 
 # for AutoLoading script modules
 Get-Module -ListAvailable | ? { $_.ModuleType -eq "Script" } | Import-Module
