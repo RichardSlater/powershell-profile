@@ -91,8 +91,7 @@ Function touch($file)
 
 Function Initialize-VSEnvironment()
 {
-  #Set environment variables for Visual Studio Command Prompt
-  pushd "C:\Program Files (x86)\Microsoft Visual Studio 11.0\vc"
+  pushd "C:\Program Files (x86)\Microsoft Visual Studio 12.0\vc"
   cmd /c "vcvarsall.bat & set" |
   foreach {
     if ($_ -match "=") {
@@ -100,12 +99,11 @@ Function Initialize-VSEnvironment()
     }
   }
   popd
-  Write-Host "`nVisual Studio 2012 Command Prompt variables set." -ForegroundColor Yellow
+  Write-Host "`nVisual Studio 2013 Command Prompt variables set." -ForegroundColor Yellow
 }
 
 Function Initialize-Ruby()
 {
-  #Set environment variables for Visual Studio Command Prompt
   pushd 'C:\Ruby200-x64\bin'
   ./setrbvars.bat
   popd
@@ -149,3 +147,7 @@ function Import-AzureModule
   $modulePath = 'C:\Program Files (x86)\Microsoft SDKs\Windows Azure\PowerShell\Azure'
   Import-Module $modulePath
 }
+
+# Load posh-git example profile
+. 'C:\Users\Richard\Documents\WindowsPowerShell\Modules\posh-git\profile.example.ps1'
+
