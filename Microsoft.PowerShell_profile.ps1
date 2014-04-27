@@ -26,19 +26,16 @@ Set-Alias sublime    $SublimePath
 Get-Module -ListAvailable | ? { $_.ModuleType -eq "Script" } | Import-Module
 
 # for editing your PowerShell profile
-Function Edit-Profile
-{
+Function Edit-Profile {
     vim $profile
 }
 
 # for editing your Vim settings
-Function Edit-Vimrc
-{
+Function Edit-Vimrc {
     vim $home\_vimrc
 }
 
-Function Configure-GitCore
-{
+Function Configure-GitCore {
     $gitIgnorePath = Join-Path $ProfilePath .gitignore
     git config --global user.name "Richard Slater"
     git config --global core.editor vim
@@ -51,46 +48,38 @@ Function Configure-GitCore
 }
 
 # for configuring git at Amido with suitable settings
-Function Configure-GitAmido
-{
-    git config --global user.email richard.slater@amido.co.uk
+Function Configure-GitAmido {
+    git config --global user.email richard.slater@amido.com
     Configure-GitCore
 }
 
 # for configuring git with suitable settings
-Function Configure-Git
-{
+Function Configure-Git {
     git config --global user.email git@richard-slater.co.uk
     Configure-GitCore
 }
 
-Function Visualize-Git
-{
+Function Visualize-Git {
     git log --oneline --decorate --all --graph --simplify-by-decoration
 }
 
-Function Goto-Source
-{
-    if (Test-Path C:\Source)
-    {
+Function Goto-Source {
+    if (Test-Path C:\Source) {
         cd C:\Source
     }
 }
 
 # for finding files, UNIX like
-Function which($name)
-{
+Function which($name) {
     Get-Command $name | Select-Object Definition
 }
 
 # for creating empty files, UNIX like
-Function touch($file)
-{
+Function touch($file) {
     "" | Out-File $file -Encoding ASCII
 }
 
-Function Initialize-VSEnvironment()
-{
+Function Initialize-VSEnvironment() {
   pushd "C:\Program Files (x86)\Microsoft Visual Studio 12.0\vc"
   cmd /c "vcvarsall.bat & set" |
   foreach {
@@ -102,16 +91,14 @@ Function Initialize-VSEnvironment()
   Write-Host "`nVisual Studio 2013 Command Prompt variables set." -ForegroundColor Yellow
 }
 
-Function Initialize-Ruby()
-{
+Function Initialize-Ruby() {
   pushd 'C:\Ruby200-x64\bin'
   ./setrbvars.bat
   popd
   Write-Host "`nRuby Environment Configured." -ForegroundColor Yellow
 }
 
-function Import-PfxCertificate 
-{
+function Import-PfxCertificate {
   param(
     [String]$certPath,
     [String]$certRootStore = "CurrentUser",
@@ -129,25 +116,14 @@ function Import-PfxCertificate
   $store.open("MaxAllowed")    
   $store.add($pfx)    
   $store.close()    
-}  
-
-function Sync-GitFlowRepository
-{
-  git checkout master
-  git pull
-  git checkout support
-  git pull
-  git checkout develop
-  git pull
-  git remote prune origin
 }
 
-function Import-AzureModule
-{
+function Import-AzureModule {
   $modulePath = 'C:\Program Files (x86)\Microsoft SDKs\Windows Azure\PowerShell\Azure'
   Import-Module $modulePath
 }
 
-# Load posh-git example profile
-. 'C:\Users\Richard\Documents\WindowsPowerShell\Modules\posh-git\profile.example.ps1'
+. $($ProfilePath + '\Modules\posh-git\profile.example.ps1') # Posh-Git
+. $($ProfilePath + '\scripts\Get-ChildItem-Color.ps1') # New-CommandWrapper used by ll
 
+Set-Alias ll Get-ChildItem-Color -option AllScope
