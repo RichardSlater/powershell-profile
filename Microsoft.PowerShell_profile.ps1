@@ -2,7 +2,7 @@ $ProfilePath    = Split-Path $profile
 $ScriptPath     = Join-Path $ProfilePath bin
 $VimPath        = Join-Path $ScriptPath "\vim\vim.exe"
 $GourcePath     = Join-Path $ScriptPath "\gource\gource.exe"
-$SublimePath    = "C:\Program Files\Sublime Text 2\sublime_text.exe"
+$SublimePath    = "C:\Program Files\Sublime Text 3\sublime_text.exe"
 $DcrawPath      = Join-Path $ScriptPath "\dcraw\dcraw.exe"
 $CJpegRootPath  = Join-Path $ScriptPath "cjpeg"
 $cjpegPath      = Join-Path $CJpegRootPath "\cjpeg\Release\cjpeg.exe"
@@ -25,9 +25,20 @@ Set-Alias sublime    $SublimePath
 # for AutoLoading script modules
 Get-Module -ListAvailable | ? { $_.ModuleType -eq "Script" } | Import-Module
 
+# for AutoLoading Microsoft modules
+if ([Environment]::Is64BitProcess) {
+  Get-Module -ListAvailable | ? { $_.Name.StartsWith("Microsoft.") } | Import-Module
+}
+
+# for AutoLoading Amido modules
+if ([Environment]::Is64BitProcess) {
+  Get-Module -ListAvailable | ? { $_.Name.StartsWith("Amido.") } | Import-Module
+}
+
 # for editing your PowerShell profile
 Function Edit-Profile {
-    vim $profile
+    vim $PROFILE
+    . $PROFILE
 }
 
 # for editing your Vim settings
@@ -126,4 +137,5 @@ function Import-AzureModule {
 . $($ProfilePath + '\Modules\posh-git\profile.example.ps1') # Posh-Git
 . $($ProfilePath + '\scripts\Get-ChildItem-Color.ps1') # New-CommandWrapper used by ll
 
-Set-Alias ll Get-ChildItem-Color -option AllScope
+Set-Alias ll Get-ChildItem-Color -Option AllScope
+Set-Alias lw Get-ChildItem-Format-Wide -Option AllScope
