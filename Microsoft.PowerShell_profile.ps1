@@ -52,7 +52,7 @@ Function Edit-Vimrc {
 }
 
 # for configururing Git
-Function Configure-GitCore {
+Function Set-GitCore {
   $gitIgnorePath = Join-Path $ProfilePath .gitignore
   git config --global user.name "Richard Slater"
   git config --global core.editor vim
@@ -65,9 +65,9 @@ Function Configure-GitCore {
 }
 
 # for configuring git at Amido with suitable settings
-Function Configure-GitAmido {
+Function Set-AmidoGitConfiguration {
   git config --global user.email richard.slater@amido.com
-  Configure-GitCore
+  Set-GitCore
 
   $sshKey = ssh-add -L | Select-String "richard.slater@amido.co.uk";
   if (!$sshKey) {
@@ -77,9 +77,15 @@ Function Configure-GitAmido {
 }
 
 # for configuring git at home with suitable settings
-Function Configure-Git {
+Function Set-PersonalGitConfiguration {
   git config --global user.email git@richard-slater.co.uk
-  Configure-GitCore
+  Set-GitCore
+
+  $sshKey = ssh-add -L | Select-String "github@richard-slater.co.uk";
+  if (!$sshKey) {
+    $sshKeyFile = Join-Path $env:USERPROFILE "Dropbox\SSH\github@richard-slater.co.uk-2011.pem";
+    ssh-add $sshKeyFile;
+  }
 }
 
 Function Visualize-Git {
