@@ -14,7 +14,7 @@ $whoisPath      = Join-Path $ScriptPath "sysinternals\whois.exe";
 $logstalgiaPath = Join-Path $ScriptPath "logstalgia\logstalgia.exe";
 
 . $($ProfilePath + '\Modules\posh-git\profile.example.ps1'); # Posh-Git
-. $($ProfilePath + '\scripts\Get-ChildItem-Color.ps1'); # New-CommandWrapper used by ll
+. $($ProfilePath + '\scripts\Get-ChildItemColor.ps1'); # Command Wrapper used by ll
 
 Set-Alias vi         $VimPath;
 Set-Alias vim        $VimPath;
@@ -24,8 +24,7 @@ Set-Alias gource     $GourcePath;
 Set-Alias whois      $whoisPath;
 Set-Alias logstalgia $logstalgiaPath;
 Set-Alias sublime    $SublimePath;
-Set-Alias ll         Get-ChildItem-Color -Option AllScope;
-Set-Alias lw         Get-ChildItem-Format-Wide -Option AllScope;
+Set-Alias ll         Get-ChildItemColor -Option AllScope;
 
 # for AutoLoading script modules
 Get-Module -ListAvailable | ? { $_.ModuleType -eq "Script" } | Import-Module;
@@ -103,13 +102,21 @@ Function Goto-Source {
 }
 
 # for finding files, UNIX like
-Function which($name) {
+Function Trace-Command($name) {
   Get-Command $name | Select-Object Definition;
 }
 
 # for creating empty files, UNIX like
-Function touch($file) {
-  "" | Out-File $file -Encoding ASCII;
+Function New-File($file) {
+  if (Test-Path $file) {
+    $date = Get-Date;
+    Get-Item $file | ForEach-Object {
+      $_.LastAccessTime = $date;
+      $_.LastWriteTime = $date;
+    }
+  } else { 
+    [String]::Empty | Out-File $file -Encoding ASCII;
+  }
 }
 
 # for initilizing the Visual Studio command prompt environment

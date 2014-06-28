@@ -1,17 +1,5 @@
-function Get-ChildItem-Color {
-    if ($Args[0] -eq $true) {
-        $ifwide = $true
-
-        if ($Args.Length -gt 1) {
-            $Args = $Args[1..($Args.length - 1)]
-        } else {
-            $Args = @()
-        }
-    } else {
-        $ifwide = $false
-    }
-
-    if (($Args[0] -eq "-a") -or ($Args[0] -eq "--all")) {
+function Get-ChildItemColor {
+    if (($Args.Count -gt 0) -And (($Args[0] -eq "-a") -Or ($Args[0] -eq "--all"))) {
         $Args[0] = "-Force"
     }
 
@@ -25,7 +13,7 @@ function Get-ChildItem-Color {
     $configs_list = @(".cfg", ".config", ".conf", ".ini")
     $code_list = @(".rb", ".cs", ".vb", ".aspx", ".py", ".pl", ".php", ".htm", ".html", ".css", ".scss", ".js", ".sql", ".json")
     $image_list = @(".png", ".jpg", ".jpeg", ".bmp", ".gif", ".ico")
-    $project_files = @(".csproj", ".vbproj", ".sln")
+    $project_list = @(".csproj", ".vbproj", ".sln")
 
     $color_table = @{}
     foreach ($Extension in $compressed_list) {
@@ -58,53 +46,22 @@ function Get-ChildItem-Color {
 
     $i = 0
     $pad = [int]($width / $cols) - 1
-    $nll = $false
 
     Invoke-Expression ("Get-ChildItem $Args") |
     %{
+        $c = $null;
         if ($_.GetType().Name -eq 'DirectoryInfo') {
             $c = $color_fore
         } else {
             $c = $color_table[$_.Extension]
-            # Write-Host $c
-            if ($c -eq $none) {
+
+            if ($c -eq $null) {
                 $c = 'Green'
             }`  
         }
 
-        if ($ifwide) {
-            if ($i -eq -1) {  # change this to `-eq 0` to show DirectoryName
-                if ($_.GetType().Name -eq "FileInfo") {
-                    $DirectoryName = $_.DirectoryName
-                } elseif ($_.GetType().Name -eq "DirectoryInfo") {
-                    $DirectoryName = $_.Parent.FullName
-                }
-                Write-Host ""
-                Write-Host -Fore 'Green' ("   Directory: " + $DirectoryName)
-                Write-Host ""
-            }
-
-            $nnl = ++$i % $cols -ne 0
-
-            $towrite = $_.Name
-            if ($towrite.length -gt $pad - 2) {
-                $towrite = $towrite.Substring(0, $pad - 5) + "..."
-            }
-
-            Write-Host ("{0,-$pad}" -f $towrite) -Fore $c -NoNewLine:$nnl
-        } else {
-            $Host.UI.RawUI.ForegroundColor = $c
-            echo $_
-            $Host.UI.RawUI.ForegroundColor = $color_fore
-        }
+        $Host.UI.RawUI.ForegroundColor = $c
+        echo $_
+        $Host.UI.RawUI.ForegroundColor = $color_fore
     }
-    if ($nnl) {
-        Write-Host ""
-    }
-}
-
-function Get-ChildItem-Format-Wide {
-    $New_Args = @($true)
-    $New_Args += $Args
-    Invoke-Expression ("Get-ChildItem-Color $New_Args")
 }
