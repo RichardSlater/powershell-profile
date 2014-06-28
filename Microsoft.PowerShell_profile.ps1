@@ -152,3 +152,6 @@ function Import-PfxCertificate {
   $store.Add($pfx);
   $store.Close(); 
 }
+
+Set-StrictMode -Version Latest;
+$Global:DebugPreference = "Continue";
