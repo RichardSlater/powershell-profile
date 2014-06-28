@@ -1,13 +1,13 @@
 "------------------------------------------------------------------------------
 "  Description: Vim Ada/Dec Ada compiler file
 "     Language: Ada (Dec Ada)
-"          $Id: decada.vim,v 1.9 2008/08/09 17:52:19 vimboss Exp $
+"          $Id: decada.vim 887 2008-07-08 14:29:01Z krischik $
 "    Copyright: Copyright (C) 2006 Martin Krischik
 "   Maintainer:	Martin Krischik <krischik@users.sourceforge.net>
-"      $Author: vimboss $
-"        $Date: 2008/08/09 17:52:19 $
+"      $Author: krischik $
+"        $Date: 2008-07-08 16:29:01 +0200 (Di, 08 Jul 2008) $
 "      Version: 4.6
-"    $Revision: 1.9 $
+"    $Revision: 887 $
 "     $HeadURL: https://gnuada.svn.sourceforge.net/svnroot/gnuada/trunk/tools/vim/compiler/decada.vim $
 "      History: 21.07.2006 MK New Dec Ada
 "               15.10.2006 MK Bram's suggestion for runtime integration
@@ -15,11 +15,11 @@
 "    Help Page: compiler-decada
 "------------------------------------------------------------------------------
 
-if (exists("current_compiler")	    &&
-   \ current_compiler == "decada")  ||
-   \ version < 700
+if (exists("current_compiler") && current_compiler == "decada") || version < 700
    finish
 endif
+let s:keepcpo= &cpo
+set cpo&vim
 
 let current_compiler = "decada"
 
@@ -43,6 +43,9 @@ endif
 
 execute "CompilerSet makeprg="     . escape (g:decada.Make_Command, ' ')
 execute "CompilerSet errorformat=" . escape (g:decada.Error_Format, ' ')
+
+let &cpo = s:keepcpo
+unlet s:keepcpo
 
 finish " 1}}}
 

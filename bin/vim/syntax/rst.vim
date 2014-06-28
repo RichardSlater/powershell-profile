@@ -1,7 +1,7 @@
 " Vim syntax file
 " Language:         reStructuredText documentation format
 " Maintainer:       Nikolai Weibull <now@bitwi.se>
-" Latest Revision:  2006-07-04
+" Latest Revision:  2013-06-03
 
 if exists("b:current_syntax")
   finish
@@ -12,12 +12,9 @@ set cpo&vim
 
 syn case ignore
 
-" FIXME: The problem with these two is that Vim doesn’t seem to like
-" matching across line boundaries.
-"
-" syn match   rstSections /^.*\n[=`:.'"~^_*+#-]\+$/
+syn match   rstSections "^\%(\([=`:.'"~^_*+#-]\)\1\+\n\)\=.\+\n\([=`:.'"~^_*+#-]\)\2\+$"
 
-" syn match   rstTransition  /^\s*[=`:.'"~^_*+#-]\{4,}\s*$/
+syn match   rstTransition  /^[=`:.'"~^_*+#-]\{4,}\s*$/
 
 syn cluster rstCruft                contains=rstEmphasis,rstStrongEmphasis,
       \ rstInterpretedText,rstInlineLiteral,rstSubstitutionReference,
@@ -138,14 +135,34 @@ execute 'syn match rstHyperlinkReference' .
 syn match   rstStandaloneHyperlink  contains=@NoSpell
       \ "\<\%(\%(\%(https\=\|file\|ftp\|gopher\)://\|\%(mailto\|news\):\)[^[:space:]'\"<>]\+\|www[[:alnum:]_-]*\.[[:alnum:]_-]\+\.[^[:space:]'\"<>]\+\)[[:alnum:]/]"
 
-" TODO: Use better syncing.  I don’t know the specifics of syncing well enough,
-" though.
-syn sync minlines=50
+syn region rstCodeBlock contained matchgroup=rstDirective
+      \ start=+\%(sourcecode\|code\%(-block\)\=\)::\s+
+      \ skip=+^$+
+      \ end=+^\s\@!+ 
+      \ contains=@NoSpell
+syn cluster rstDirectives add=rstCodeBlock
+
+if !exists('g:rst_syntax_code_list')
+    let g:rst_syntax_code_list = ['vim', 'java', 'cpp', 'lisp', 'php', 'python', 'perl']
+endif
+
+for code in g:rst_syntax_code_list
+    unlet! b:current_syntax
+    exe 'syn include @rst'.code.' syntax/'.code.'.vim'
+    exe 'syn region rstDirective'.code.' matchgroup=rstDirective fold '
+                \.'start=#\%(sourcecode\|code\%(-block\)\=\)::\s\+'.code.'\s*$# '
+                \.'skip=#^$# '
+                \.'end=#^\s\@!# contains=@NoSpell,@rst'.code
+    exe 'syn cluster rstDirectives add=rstDirective'.code
+endfor
+
+" TODO: Use better syncing.
+syn sync minlines=50 linebreaks=2
 
 hi def link rstTodo                         Todo
 hi def link rstComment                      Comment
-"hi def link rstSections                     Type
-"hi def link rstTransition                   Type
+hi def link rstSections                     Title
+hi def link rstTransition                   rstSections
 hi def link rstLiteralBlock                 String
 hi def link rstQuotedLiteralBlock           String
 hi def link rstDoctestBlock                 PreProc
@@ -171,6 +188,7 @@ hi def link rstFootnoteReference            Identifier
 hi def link rstCitationReference            Identifier
 hi def link rstHyperLinkReference           Identifier
 hi def link rstStandaloneHyperlink          Identifier
+hi def link rstCodeBlock                    String
 
 let b:current_syntax = "rst"
 

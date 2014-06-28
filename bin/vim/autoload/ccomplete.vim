@@ -1,8 +1,10 @@
 " Vim completion script
 " Language:	C
 " Maintainer:	Bram Moolenaar <Bram@vim.org>
-" Last Change:	2007 Aug 30
+" Last Change:	2012 Jun 20
 
+let s:cpo_save = &cpo
+set cpo&vim
 
 " This function is used for the 'omnifunc' option.
 function! ccomplete#Complete(findstart, base)
@@ -161,7 +163,7 @@ function! ccomplete#Complete(findstart, base)
       let res = [{'match': match, 'tagline' : '', 'kind' : kind, 'info' : line}]
     else
       " Completing "var.", "var.something", etc.
-      let res = s:Nextitem(strpart(line, 0, col), items[-1], 0, 1)
+      let res = s:Nextitem(strpart(line, 0, col), items[1:], 0, 1)
     endif
   endif
 
@@ -498,7 +500,7 @@ function! s:StructMembers(typename, items, all)
   endif
   if !cached
     while 1
-      exe 'silent! ' . n . 'vimgrep /\t' . typename . '\(\t\|$\)/j ' . fnames
+      exe 'silent! keepj noautocmd ' . n . 'vimgrep /\t' . typename . '\(\t\|$\)/j ' . fnames
 
       let qflist = getqflist()
       if len(qflist) > 0 || match(typename, "::") < 0
@@ -603,3 +605,6 @@ function! s:SearchMembers(matches, items, all)
   endfor
   return res
 endfunc
+
+let &cpo = s:cpo_save
+unlet s:cpo_save

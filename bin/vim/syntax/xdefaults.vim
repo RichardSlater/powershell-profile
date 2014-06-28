@@ -4,7 +4,7 @@
 "		Author and previous maintainer:
 "		Gautam H. Mudunuri <gmudunur@informatica.com>
 " Last Change:	Di, 09 Mai 2006 23:10:23 CEST
-" $Id: xdefaults.vim,v 1.10 2008/08/09 17:41:29 vimboss Exp $
+" $Id: xdefaults.vim,v 1.2 2007/05/05 17:19:40 vimboss Exp $
 "
 " REFERENCES:
 "   xrdb manual page
@@ -33,7 +33,7 @@ endif
 
 
 " syn region  xdefaultsLabel   start=+^[^:]\{-}:+he=e-1 skip=+\\+ end="$"
-syn match   xdefaultsLabel   +[^:]\{-}:+he=e-1                       contains=xdefaultsPunct,xdefaultsSpecial,xdefaultsLineEnd
+syn match   xdefaultsLabel   +^[^:]\{-}:+he=e-1                       contains=xdefaultsPunct,xdefaultsSpecial,xdefaultsLineEnd
 syn region  xdefaultsValue   keepend start=+:+lc=1 skip=+\\+ end=+$+ contains=xdefaultsSpecial,xdefaultsLabel,xdefaultsLineEnd
 
 syn match   xdefaultsSpecial	contained +#override+
@@ -75,9 +75,9 @@ endif
 syn region	xdefaultsIncluded	contained start=+"+ skip=+\\\\\|\\"+ end=+"+
 syn match	xdefaultsIncluded	contained "<[^>]*>"
 syn match	xdefaultsInclude	"^\s*#\s*include\>\s*["<]" contains=xdefaultsIncluded
-syn cluster	xdefaultsPreProcGroup	contains=xdefaultsPreProc,xdefaultsIncluded,xdefaultsInclude,xdefaultsDefine
-syn region	xdefaultsDefine		start="^\s*#\s*\(define\|undef\)\>" skip="\\$" end="$" contains=ALLBUT,@xdefaultsPreProcGroup,xdefaultsCommentH,xdefaultsErrorLine
-syn region	xdefaultsPreProc	start="^\s*#\s*\(pragma\>\|line\>\|warning\>\|warn\>\|error\>\)" skip="\\$" end="$" keepend contains=ALLBUT,@xdefaultsPreProcGroup,xdefaultsCommentH,xdefaultsErrorLine
+syn cluster	xdefaultsPreProcGroup	contains=xdefaultsPreProc,xdefaultsIncluded,xdefaultsInclude,xdefaultsDefine,xdefaultsCppOut,xdefaultsCppOut2,xdefaultsCppSkip
+syn region	xdefaultsDefine		start="^\s*#\s*\(define\|undef\)\>" skip="\\$" end="$" contains=ALLBUT,@xdefaultsPreProcGroup,xdefaultsCommentH,xdefaultsErrorLine,xdefaultsLabel,xdefaultsValue
+syn region	xdefaultsPreProc	start="^\s*#\s*\(pragma\>\|line\>\|warning\>\|warn\>\|error\>\)" skip="\\$" end="$" keepend contains=ALLBUT,@xdefaultsPreProcGroup,xdefaultsCommentH,xdefaultsErrorLine,xdefaultsLabel,xdefaultsValue
 
 
 

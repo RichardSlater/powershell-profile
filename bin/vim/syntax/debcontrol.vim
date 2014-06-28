@@ -1,14 +1,10 @@
 " Vim syntax file
-" Language:	Debian control files
+" Language:    Debian control files
 " Maintainer:  Debian Vim Maintainers <pkg-vim-maintainers@lists.alioth.debian.org>
 " Former Maintainers: Gerfried Fuchs <alfie@ist.org>
 "                     Wichert Akkerman <wakkerma@debian.org>
-" Last Change: 2008-02-23
-" URL: http://git.debian.org/?p=pkg-vim/vim.git;a=blob_plain;f=runtime/ftplugin/debcontrol.vim;hb=debian
-
-" Comments are very welcome - but please make sure that you are commenting on
-" the latest version of this file.
-" SPAM is _NOT_ welcome - be ready to be reported!
+" Last Change: 2013 May 05
+" URL: http://anonscm.debian.org/hg/pkg-vim/vim/raw-file/unstable/runtime/syntax/debcontrol.vim
 
 " Standard syntax initialization
 if version < 600
@@ -28,10 +24,11 @@ syn match debControlComma ", *"
 syn match debControlSpace " "
 
 " Define some common expressions we can use later on
-syn match debcontrolArchitecture contained "\(all\|any\|alpha\|amd64\|arm\(e[bl]\)\=\|hppa\|i386\|ia64\|m32r\|m68k\|mipsel\|mips\|powerpc\|ppc64\|s390x\=\|sh[34]\(eb\)\=\|sh\|sparc64\|sparc\|hurd-i386\|kfreebsd-\(i386\|gnu\)\|knetbsd-i386\|netbsd-\(alpha\|i386\)\)"
+syn match debcontrolArchitecture contained "\%(all\|linux-any\|\%(any-\)\=\%(alpha\|amd64\|arm\%(e[bl]\|hf\)\=\|avr32\|hppa\|i386\|ia64\|lpia\|m32r\|m68k\|mips\%(el\)\=\|powerpc\|ppc64\|s390x\=\|sh[34]\(eb\)\=\|sh\|sparc\%(64\)\=\)\|hurd-\%(i386\|any\)\|kfreebsd-\%(i386\|amd64\|any\)\|knetbsd-\%(i386\|any\)\|kopensolaris-\%(i386\|any\)\|netbsd-\%(alpha\|i386\|any\)\|any\)"
+syn match debcontrolMultiArch contained "\%(no\|foreign\|allowed\|same\)"
 syn match debcontrolName contained "[a-z0-9][a-z0-9+.-]\+"
 syn match debcontrolPriority contained "\(extra\|important\|optional\|required\|standard\)"
-syn match debcontrolSection contained "\(\(contrib\|non-free\|non-US/main\|non-US/contrib\|non-US/non-free\|restricted\|universe\|multiverse\)/\)\=\(admin\|base\|comm\|devel\|doc\|editors\|electronics\|embedded\|games\|gnome\|graphics\|hamradio\|interpreters\|kde\|libs\|libdevel\|mail\|math\|misc\|net\|news\|oldlibs\|otherosfs\|perl\|python\|science\|shells\|sound\|text\|tex\|utils\|web\|x11\|debian-installer\)"
+syn match debcontrolSection contained "\v((contrib|non-free|non-US/main|non-US/contrib|non-US/non-free|restricted|universe|multiverse)/)?(admin|cli-mono|comm|database|debian-installer|debug|devel|doc|editors|education|electronics|embedded|fonts|games|gnome|gnustep|gnu-r|graphics|hamradio|haskell|httpd|interpreters|introspection|java|kde|kernel|libs|libdevel|lisp|localization|mail|math|metapackages|misc|net|news|ocaml|oldlibs|otherosfs|perl|php|python|ruby|science|shells|sound|text|tex|utils|vcs|video|web|x11|xfce|zope)"
 syn match debcontrolPackageType contained "u\?deb"
 syn match debcontrolVariable contained "\${.\{-}}"
 syn match debcontrolDmUpload contained "\cyes"
@@ -41,36 +38,40 @@ syn match debcontrolDmUpload contained "\cyes"
 syn match debcontrolHTTPUrl contained "\vhttps?://[[:alnum:]][-[:alnum:]]*[[:alnum:]]?(\.[[:alnum:]][-[:alnum:]]*[[:alnum:]]?)*\.[[:alpha:]][-[:alnum:]]*[[:alpha:]]?(:\d+)?(/[^[:space:]]*)?$"
 syn match debcontrolVcsSvn contained "\vsvn%(\+ssh)?://[[:alnum:]][-[:alnum:]]*[[:alnum:]]?(\.[[:alnum:]][-[:alnum:]]*[[:alnum:]]?)*\.[[:alpha:]][-[:alnum:]]*[[:alpha:]]?(:\d+)?(/[^[:space:]]*)?$"
 syn match debcontrolVcsCvs contained "\v%(\-d *)?:pserver:[^@]+\@[[:alnum:]][-[:alnum:]]*[[:alnum:]]?(\.[[:alnum:]][-[:alnum:]]*[[:alnum:]]?)*\.[[:alpha:]][-[:alnum:]]*[[:alpha:]]?:/[^[:space:]]*%( [^[:space:]]+)?$"
-syn match debcontrolVcsGit contained "\vgit://[[:alnum:]][-[:alnum:]]*[[:alnum:]]?(\.[[:alnum:]][-[:alnum:]]*[[:alnum:]]?)*\.[[:alpha:]][-[:alnum:]]*[[:alpha:]]?(:\d+)?(/[^[:space:]]*)?$"
+syn match debcontrolVcsGit contained "\v%(git|http)://[[:alnum:]][-[:alnum:]]*[[:alnum:]]?(\.[[:alnum:]][-[:alnum:]]*[[:alnum:]]?)*\.[[:alpha:]][-[:alnum:]]*[[:alpha:]]?(:\d+)?(/[^[:space:]]*)?%(\s+-b\s+[^ ~^:?*[\\]+)?$"
 
 " An email address
 syn match	debcontrolEmail	"[_=[:alnum:]\.+-]\+@[[:alnum:]\./\-]\+"
 syn match	debcontrolEmail	"<.\{-}>"
 
 " #-Comments
-syn match debcontrolComment "^#.*$"
+syn match debcontrolComment "^#.*$" contains=@Spell
 
 syn case ignore
 
 " List of all legal keys
-syn match debcontrolKey contained "^\(Source\|Package\|Section\|Priority\|Maintainer\|Uploaders\|Build-Depends\|Build-Conflicts\|Build-Depends-Indep\|Build-Conflicts-Indep\|Standards-Version\|Pre-Depends\|Depends\|Recommends\|Suggests\|Provides\|Replaces\|Conflicts\|Essential\|Architecture\|Description\|Bugs\|Origin\|Enhances\|Homepage\|\(XS-\)\=Vcs-\(Browser\|Arch\|Bzr\|Cvs\|Darcs\|Git\|Hg\|Mtn\|Svn\)\|XC-Package-Type\|\%(XS-\)\=DM-Upload-Allowed\): *"
+syn match debcontrolKey contained "^\%(Source\|Package\|Section\|Priority\|\%(XSBC-Original-\)\=Maintainer\|Uploaders\|Build-\%(Conflicts\|Depends\)\%(-Indep\)\=\|Standards-Version\|\%(Pre-\)\=Depends\|Recommends\|Suggests\|Provides\|Replaces\|Conflicts\|Enhances\|Breaks\|Essential\|Architecture\|Multi-Arch\|Description\|Bugs\|Origin\|X[SB]-Python-Version\|Homepage\|\(XS-\)\=Vcs-\(Browser\|Arch\|Bzr\|Cvs\|Darcs\|Git\|Hg\|Mtn\|Svn\)\|\%(XC-\)\=Package-Type\): *"
+
+syn match debcontrolDeprecatedKey contained "^\%(\%(XS-\)\=DM-Upload-Allowed\): *"
 
 " Fields for which we do strict syntax checking
 syn region debcontrolStrictField start="^Architecture" end="$" contains=debcontrolKey,debcontrolArchitecture,debcontrolSpace oneline
+syn region debcontrolStrictField start="^Multi-Arch" end="$" contains=debcontrolKey,debcontrolMultiArch oneline
 syn region debcontrolStrictField start="^\(Package\|Source\)" end="$" contains=debcontrolKey,debcontrolName oneline
 syn region debcontrolStrictField start="^Priority" end="$" contains=debcontrolKey,debcontrolPriority oneline
 syn region debcontrolStrictField start="^Section" end="$" contains=debcontrolKey,debcontrolSection oneline
-syn region debcontrolStrictField start="^XC-Package-Type" end="$" contains=debcontrolKey,debcontrolPackageType oneline
+syn region debcontrolStrictField start="^\%(XC-\)\=Package-Type" end="$" contains=debcontrolKey,debcontrolPackageType oneline
 syn region debcontrolStrictField start="^Homepage" end="$" contains=debcontrolKey,debcontrolHTTPUrl oneline keepend
-syn region debcontrolStrictField start="^\%(XS-\)\?Vcs-\%(Browser\|Arch\|Bzr\|Darcs\|Hg\)" end="$" contains=debcontrolKey,debcontrolHTTPUrl oneline keepend
-syn region debcontrolStrictField start="^\%(XS-\)\?Vcs-Svn" end="$" contains=debcontrolKey,debcontrolVcsSvn,debcontrolHTTPUrl oneline keepend
-syn region debcontrolStrictField start="^\%(XS-\)\?Vcs-Cvs" end="$" contains=debcontrolKey,debcontrolVcsCvs oneline keepend
-syn region debcontrolStrictField start="^\%(XS-\)\?Vcs-Git" end="$" contains=debcontrolKey,debcontrolVcsGit oneline keepend
-syn region debcontrolStrictField start="^\%(XS-\)\?DM-Upload-Allowed" end="$" contains=debcontrolKey,debcontrolDmUpload oneline
+syn region debcontrolStrictField start="^\%(XS-\)\=Vcs-\%(Browser\|Arch\|Bzr\|Darcs\|Hg\)" end="$" contains=debcontrolKey,debcontrolHTTPUrl oneline keepend
+syn region debcontrolStrictField start="^\%(XS-\)\=Vcs-Svn" end="$" contains=debcontrolKey,debcontrolVcsSvn,debcontrolHTTPUrl oneline keepend
+syn region debcontrolStrictField start="^\%(XS-\)\=Vcs-Cvs" end="$" contains=debcontrolKey,debcontrolVcsCvs oneline keepend
+syn region debcontrolStrictField start="^\%(XS-\)\=Vcs-Git" end="$" contains=debcontrolKey,debcontrolVcsGit oneline keepend
+syn region debcontrolStrictField start="^\%(XS-\)\=DM-Upload-Allowed" end="$" contains=debcontrolDeprecatedKey,debcontrolDmUpload oneline
 
 " Catch-all for the other legal fields
-syn region debcontrolField start="^\(Maintainer\|Standards-Version\|Essential\|Bugs\|Origin\|X\(S\|B\)-Python-Version\|XSBC-Original-Maintainer\|\(XS-\)\?Vcs-Mtn\):" end="$" contains=debcontrolKey,debcontrolVariable,debcontrolEmail oneline
-syn region debcontrolMultiField start="^\(Build-\(Conflicts\|Depends\)\(-Indep\)\=\|\(Pre-\)\=Depends\|Recommends\|Suggests\|Provides\|Replaces\|Conflicts\|Enhances\|Uploaders\|Description\):" skip="^ " end="^$"me=s-1 end="^[^ ]"me=s-1 contains=debcontrolKey,debcontrolEmail,debcontrolVariable
+syn region debcontrolField start="^\%(\%(XSBC-Original-\)\=Maintainer\|Standards-Version\|Essential\|Bugs\|Origin\|X[SB]-Python-Version\|\%(XS-\)\=Vcs-Mtn\):" end="$" contains=debcontrolKey,debcontrolVariable,debcontrolEmail oneline
+syn region debcontrolMultiField start="^\%(Build-\%(Conflicts\|Depends\)\%(-Indep\)\=\|\%(Pre-\)\=Depends\|Recommends\|Suggests\|Provides\|Replaces\|Conflicts\|Enhances\|Breaks\|Uploaders\|Description\):" skip="^ " end="^$"me=s-1 end="^[^ #]"me=s-1 contains=debcontrolKey,debcontrolEmail,debcontrolVariable,debcontrolComment
+syn region debcontrolMultiFieldSpell start="^\%(Description\):" skip="^ " end="^$"me=s-1 end="^[^ #]"me=s-1 contains=debcontrolKey,debcontrolEmail,debcontrolVariable,debcontrolComment,@Spell
 
 " Associate our matches and regions with pretty colours
 if version >= 508 || !exists("did_debcontrol_syn_inits")
@@ -84,8 +85,10 @@ if version >= 508 || !exists("did_debcontrol_syn_inits")
   HiLink debcontrolKey		Keyword
   HiLink debcontrolField	Normal
   HiLink debcontrolStrictField	Error
+  HiLink debcontrolDeprecatedKey	Error
   HiLink debcontrolMultiField	Normal
   HiLink debcontrolArchitecture	Normal
+  HiLink debcontrolMultiArch	Normal
   HiLink debcontrolName		Normal
   HiLink debcontrolPriority	Normal
   HiLink debcontrolSection	Normal

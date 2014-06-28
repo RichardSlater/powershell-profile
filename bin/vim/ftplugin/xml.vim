@@ -1,8 +1,8 @@
 " Vim filetype plugin file
 " Language:	xml
-" Maintainer:	Dan Sharp <dwsharp at hotmail dot com>
-" Last Changed: 30 Jun 2008
-" URL:		http://mywebpage.netscape.com/sharppeople/vim/ftplugin
+" Maintainer:	Dan Sharp <dwsharp at users dot sourceforge dot net>
+" Last Changed: 20 Jan 2009
+" URL:		http://dwsharp.users.sourceforge.net/vim/ftplugin
 
 if exists("b:did_ftplugin") | finish | endif
 let b:did_ftplugin = 1
@@ -61,3 +61,4 @@ let b:undo_ftplugin = "setlocal commentstring< comments< formatoptions<" .
 
 " Restore the saved compatibility options.
 let &cpo = s:save_cpo
+unlet s:save_cpo

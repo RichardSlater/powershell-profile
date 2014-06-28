@@ -1,4 +1,4 @@
-*sign.txt*      For Vim version 7.2.  Last change: 2006 Apr 24
+*sign.txt*      For Vim version 7.4.  Last change: 2012 Jul 10
 
 
 		  VIM REFERENCE MANUAL    by Gordon Prieur
@@ -53,7 +53,7 @@ disappears again.  The color of the column is set with the SignColumn group
 ==============================================================================
 2. Commands					*sign-commands* *:sig* *:sign*
 
-Here is an example that places a sign piet, displayed with the text ">>", in
+Here is an example that places a sign "piet", displayed with the text ">>", in
 line 23 of the current file: >
 	:sign define piet text=>> texthl=Search
 	:exe ":sign place 2 line=23 name=piet file=" . expand("%:p")
@@ -70,12 +70,13 @@ DEFINING A SIGN.			*:sign-define* *E255* *E160* *E612*
 :sign define {name} {argument}...
 		Define a new sign or set attributes for an existing sign.
 		The {name} can either be a number (all digits) or a name
-		starting with a non-digit.
+		starting with a non-digit.  Leading digits are ignored, thus
+		"0012", "012" and "12" are considered the same name.
 		About 120 different signs can be defined.
 
 		Accepted arguments:
 
-	icon={pixmap}
+	icon={bitmap}
 		Define the file name where the bitmap can be found.  Should be
 		a full path.  The bitmap should fit in the place of two
 		characters.  This is not checked.  If the bitmap is too big it
@@ -85,6 +86,8 @@ DEFINING A SIGN.			*:sign-define* *E255* *E160* *E612*
 			GTK 1		pixmap (.xpm)
 			GTK 2		many
 			Motif		pixmap (.xpm)
+			Win32		.bmp, .ico, .cur
+					pixmap (.xpm) |+xpm_w32|
 
 	linehl={group}
 		Highlighting group used for the whole line the sign is placed
@@ -150,8 +153,14 @@ REMOVING SIGNS						*:sign-unplace* *E159*
 		Remove the previously placed sign {id} from file {fname}.
 		See remark above about {fname} |:sign-fname|.
 
+:sign unplace * file={fname}
+		Remove all placed signs in file {fname}.
+
 :sign unplace {id} buffer={nr}
-		Same, but use buffer {nr}.
+		Remove the previously placed sign {id} from buffer {nr}.
+
+:sign unplace * buffer={nr}
+		Remove all placed signs in buffer {nr}.
 
 :sign unplace {id}
 		Remove the previously placed sign {id} from all files it

@@ -1,4 +1,4 @@
-*usr_28.txt*	For Vim version 7.2.  Last change: 2008 Jun 14
+*usr_28.txt*	For Vim version 7.4.  Last change: 2008 Jun 14
 
 		     VIM USER MANUAL - by Bram Moolenaar
 
@@ -18,7 +18,7 @@ This chapter explains the different ways this can be done.
 |28.7|	Folding by syntax
 |28.8|	Folding by expression
 |28.9|	Folding unchanged lines
-|28.10| Which fold method to use?
+|28.10|	Which fold method to use?
 
      Next chapter: |usr_29.txt|  Moving through programs
  Previous chapter: |usr_27.txt|  Search commands and patterns
@@ -389,7 +389,7 @@ For more details see |fold-diff|.
 ==============================================================================
 *28.10* Which fold method to use?
 
-All these possibilities make you wonder which method you should chose.
+All these possibilities make you wonder which method you should choose.
 Unfortunately, there is no golden rule.  Here are some hints.
 
 If there is a syntax file with folding for the language you are editing, that

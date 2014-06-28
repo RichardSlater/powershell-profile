@@ -1,4 +1,4 @@
-*visual.txt*    For Vim version 7.2.  Last change: 2006 Sep 26
+*visual.txt*    For Vim version 7.4.  Last change: 2012 Aug 15
 
 
 		  VIM REFERENCE MANUAL    by Bram Moolenaar
@@ -61,15 +61,27 @@ position.
 2. Starting and stopping Visual mode			*visual-start*
 
 						*v* *characterwise-visual*
-v			start Visual mode per character.
+[count]v		Start Visual mode per character.
+			With [count] select the same number of characters or
+			lines as used for the last Visual operation, but at
+			the current cursor position, multiplied by [count].
+			When the previous Visual operation was on a block both
+			the width and height of the block are multiplied by
+			[count].
+			When there was no previous Visual operation [count]
+			characters are selected.  This is like moving the
+			cursor right N * [count] characters.  One less when
+			'selection' is not "exclusive".
 
 						*V* *linewise-visual*
-V			start Visual mode linewise.
+[count]V		Start Visual mode linewise.
+			With [count] select that many lines.
 
 						*CTRL-V* *blockwise-visual*
-CTRL-V			start Visual mode blockwise.  Note: Under Windows
+[count]CTRL-V		Start Visual mode blockwise.  Note: Under Windows
 			CTRL-V could be mapped to paste text, it doesn't work
 			to start Visual mode then, see |CTRL-V-alternative|.
+			[count] is used as with `v` above.
 
 If you use <Esc>, click the left mouse button or use any command that
 does a jump to another buffer while in Visual mode, the highlighting stops
@@ -93,6 +105,18 @@ gv			Start Visual mode with the same area as the previous
 			area are exchanged.
 			After using "p" or "P" in Visual mode the text that
 			was put will be selected.
+
+								*gn* *v_gn*
+gn			Search forward for the last used search pattern, like
+			with `n`, and start Visual mode to select the match.
+			If the cursor is on the match, visually selects it.
+			If an operator is pending, operates on the match.
+			E.g., "dgn" deletes the text of the next match.
+			If Visual mode is active, extends the selection
+			until the end of the next match.
+
+								*gN* *v_gN*
+gN			Like |gn| but searches backward, like with `N`.
 
 							*<LeftMouse>*
 <LeftMouse>		Set the current cursor position.  If Visual mode is
@@ -211,13 +235,21 @@ The objects that can be used are:
 	ib	inner () block					|v_ib|
 	aB	a {} block (with braces)			|v_aB|
 	iB	inner {} block					|v_iB|
+	at	a <tag> </tag> block (with tags)		|v_at|
+	it	inner <tag> </tag> block			|v_it|
 	a<	a <> block (with <>)				|v_a<|
 	i<	inner <> block					|v_i<|
 	a[	a [] block (with [])				|v_a[|
 	i[	inner [] block					|v_i[|
+	a"	a double quoted string (with quotes)		|v_aquote|
+	i"	inner double quoted string			|v_iquote|
+	a'	a single quoted string (with quotes)		|v_a'|
+	i'	inner simple quoted string			|v_i'|
+	a`	a string in backticks (with backticks)		|v_a`|
+	i`	inner string in backticks			|v_i`|
 
 Additionally the following commands can be used:
-	:	start ex command for highlighted lines (1)	|v_:|
+	:	start Ex command for highlighted lines (1)	|v_:|
 	r	change (4)					|v_r|
 	s	change						|v_s|
 	C	change (2)(4)					|v_C|
@@ -261,7 +293,10 @@ with {motion}, which is only ONE movement command.
 Another way to operate on the Visual area is using the |/\%V| item in a
 pattern.  For example, to replace all '(' in the Visual area with '#': >
 
-	:%s/\%V(/X/g
+	:'<,'>s/\%V(/#/g
+
+Note that the "'<,'>" will appear automatically when you press ":" in Visual
+mode.
 
 ==============================================================================
 5. Blockwise operators					*blockwise-operators*
@@ -309,8 +344,6 @@ The block is shifted by 'shiftwidth'.  The RHS of the block is irrelevant.  The
 LHS of the block determines the point from which to apply a right shift, and
 padding includes TABs optimally according to 'ts' and 'et'.  The LHS of the
 block determines the point upto which to shift left.
-    Note: v_< padding is buggy if the Visual Block starts and ends in the same
-    TAB. (Vim 5.4c)
 See |v_b_>_example|.
 See |v_b_<_example|.
 
@@ -464,6 +497,10 @@ When mappings and menus are defined with the |:vmap| or |:vmenu| command they
 work both in Visual mode and in Select mode.  When these are used in Select
 mode Vim automatically switches to Visual mode, so that the same behavior as
 in Visual mode is effective.  If you don't want this use |:xmap| or |:smap|.
+
+Users will expect printable characters to replace the selected area.
+Therefore avoid mapping printable characters in Select mode.  Or use
+|:sunmap|  after |:map| and |:vmap| to remove it for Select mode.
 
 After the mapping or menu finishes, the selection is enabled again and Select
 mode entered, unless the selected area was deleted, another buffer became

@@ -1,4 +1,4 @@
-*if_perl.txt*   For Vim version 7.2.  Last change: 2006 Mar 06
+*if_perl.txt*   For Vim version 7.4.  Last change: 2012 Oct 25
 
 
 		  VIM REFERENCE MANUAL    by Sven Verdoolaege
@@ -44,15 +44,17 @@ The Perl patches for Vim were made by:
 	Sven Verdoolaege <skimo@breughel.ufsia.ac.be>
 	Matt Gerassimof
 
-Perl for MS-Windows can be found at:
-http://www.perl.com/CPAN/ports/nt/Standard/x86/
+Perl for MS-Windows can be found at: http://www.perl.com/
+The ActiveState one should work.
 
 ==============================================================================
 3. Using the Perl interface				*perl-using*
 
 							*:perl* *:pe*
 :pe[rl] {cmd}		Execute Perl command {cmd}.  The current package
-			is "main".
+			is "main".  Simple example to test if `:perl` is
+			working: >
+				:perl VIM::Msg("Hello")
 
 :pe[rl] << {endpattern}
 {script}
@@ -173,7 +175,8 @@ VIM::Windows([{wn}...])	With no arguments, returns a list of all the windows
 VIM::DoCommand({cmd})	Executes Ex command {cmd}.
 
 							*perl-Eval*
-VIM::Eval({expr})	Evaluates {expr} and returns (success, val).
+VIM::Eval({expr})	Evaluates {expr} and returns (success, value) in list 
+			context or just value in scalar context.
 			success=1 indicates that val contains the value of
 			{expr}; success=0 indicates a failure to evaluate
 			the expression.  '@x' returns the contents of register
@@ -265,18 +268,26 @@ Note that "EOF" must be at the start of the line.
 ==============================================================================
 4. Dynamic loading					*perl-dynamic*
 
-On MS-Windows the Perl library can be loaded dynamically.  The |:version|
-output then includes |+perl/dyn|.
+On MS-Windows and Unix the Perl library can be loaded dynamically.  The
+|:version| output then includes |+perl/dyn|.
 
-This means that Vim will search for the Perl DLL file only when needed.  When
-you don't use the Perl interface you don't need it, thus you can use Vim
-without this DLL file.
+This means that Vim will search for the Perl DLL or shared library file only
+when needed.  When you don't use the Perl interface you don't need it, thus
+you can use Vim without this file.
 
-To use the Perl interface the Perl DLL must be in your search path.  In a
-console window type "path" to see what directories are used.
+
+MS-Windows ~
+
+You can download Perl from http://www.perl.org.  The one from ActiveState was
+used for building Vim.
+
+To use the Perl interface the Perl DLL must be in your search path.
+If Vim reports it cannot find the perl512.dll, make sure your $PATH includes
+the directory where it is located.  The Perl installer normally does that.
+In a console window type "path" to see what directories are used.
 
 The name of the DLL must match the Perl version Vim was compiled with.
-Currently the name is "perl58.dll".  That is for Perl 5.8.  To know for
+Currently the name is "perl512.dll".  That is for Perl 5.12.  To know for
 sure edit "gvim.exe" and search for "perl\d*.dll\c".
 
 ==============================================================================

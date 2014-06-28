@@ -1,9 +1,7 @@
 " Vim syntax file
 " Language:		eRuby
-" Maintainer:		Tim Pope <vimNOSPAM@tpope.info>
-" Info:			$Id: eruby.vim,v 1.13 2008/08/09 17:49:33 vimboss Exp $
-" URL:			http://vim-ruby.rubyforge.org
-" Anon CVS:		See above site
+" Maintainer:		Tim Pope <vimNOSPAM@tpope.org>
+" URL:			https://github.com/vim-ruby/vim-ruby
 " Release Coordinator:	Doug Kearns <dougkearns@gmail.com>
 
 if exists("b:current_syntax")
@@ -18,11 +16,13 @@ if !exists("g:eruby_default_subtype")
   let g:eruby_default_subtype = "html"
 endif
 
-if !exists("b:eruby_subtype") && main_syntax == 'eruby'
+if &filetype =~ '^eruby\.'
+  let b:eruby_subtype = matchstr(&filetype,'^eruby\.\zs\w\+')
+elseif !exists("b:eruby_subtype") && main_syntax == 'eruby'
   let s:lines = getline(1)."\n".getline(2)."\n".getline(3)."\n".getline(4)."\n".getline(5)."\n".getline("$")
   let b:eruby_subtype = matchstr(s:lines,'eruby_subtype=\zs\w\+')
   if b:eruby_subtype == ''
-    let b:eruby_subtype = matchstr(substitute(expand("%:t"),'\c\%(\.erb\|\.eruby\)\+$','',''),'\.\zs\w\+$')
+    let b:eruby_subtype = matchstr(substitute(expand("%:t"),'\c\%(\.erb\|\.eruby\|\.erubis\)\+$','',''),'\.\zs\w\+$')
   endif
   if b:eruby_subtype == 'rhtml'
     let b:eruby_subtype = 'html'
@@ -56,13 +56,13 @@ syn include @rubyTop syntax/ruby.vim
 syn cluster erubyRegions contains=erubyOneLiner,erubyBlock,erubyExpression,erubyComment
 
 exe 'syn region  erubyOneLiner   matchgroup=erubyDelimiter start="^%\{1,'.b:eruby_nest_level.'\}%\@!"    end="$"     contains=@rubyTop	     containedin=ALLBUT,@erubyRegions keepend oneline'
-exe 'syn region  erubyBlock      matchgroup=erubyDelimiter start="<%\{1,'.b:eruby_nest_level.'\}%\@!-\=" end="-\=%\@<!%\{1,'.b:eruby_nest_level.'\}>" contains=@rubyTop        containedin=ALLBUT,@erubyRegions keepend'
-exe 'syn region  erubyExpression matchgroup=erubyDelimiter start="<%\{1,'.b:eruby_nest_level.'\}="       end="-\=%\@<!%\{1,'.b:eruby_nest_level.'\}>" contains=@rubyTop        containedin=ALLBUT,@erubyRegions keepend'
-exe 'syn region  erubyComment    matchgroup=erubyDelimiter start="<%\{1,'.b:eruby_nest_level.'\}#"       end="-\=%\@<!%\{1,'.b:eruby_nest_level.'\}>" contains=rubyTodo,@Spell containedin=ALLBUT,@erubyRegions keepend'
+exe 'syn region  erubyBlock      matchgroup=erubyDelimiter start="<%\{1,'.b:eruby_nest_level.'\}%\@!-\=" end="[=-]\=%\@<!%\{1,'.b:eruby_nest_level.'\}>" contains=@rubyTop  containedin=ALLBUT,@erubyRegions keepend'
+exe 'syn region  erubyExpression matchgroup=erubyDelimiter start="<%\{1,'.b:eruby_nest_level.'\}=\{1,4}" end="[=-]\=%\@<!%\{1,'.b:eruby_nest_level.'\}>" contains=@rubyTop  containedin=ALLBUT,@erubyRegions keepend'
+exe 'syn region  erubyComment    matchgroup=erubyDelimiter start="<%\{1,'.b:eruby_nest_level.'\}-\=#"    end="[=-]\=%\@<!%\{1,'.b:eruby_nest_level.'\}>" contains=rubyTodo,@Spell containedin=ALLBUT,@erubyRegions keepend'
 
 " Define the default highlighting.
 
-hi def link erubyDelimiter		Delimiter
+hi def link erubyDelimiter		PreProc
 hi def link erubyComment		Comment
 
 let b:current_syntax = 'eruby'

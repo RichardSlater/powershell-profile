@@ -1,4 +1,4 @@
-*insert.txt*    For Vim version 7.2.  Last change: 2008 Jun 21
+*insert.txt*    For Vim version 7.4.  Last change: 2013 Jul 12
 
 
 		  VIM REFERENCE MANUAL    by Bram Moolenaar
@@ -123,6 +123,7 @@ CTRL-R {0-9a-z"%#*+:.-=}					*i_CTRL-R*
 			':'	the last command-line
 			'.'	the last inserted text
 			'-'	the last small (less than a line) delete
+							*i_CTRL-R_=*
 			'='	the expression register: you are prompted to
 				enter an expression (see |expression|)
 				Note that 0x80 (128 decimal) is used for
@@ -133,6 +134,10 @@ CTRL-R {0-9a-z"%#*+:.-=}					*i_CTRL-R*
 				When the result is a |List| the items are used
 				as lines.  They can have line breaks inside
 				too.
+				When the result is a Float it's automatically
+				converted to a String.
+				When append() or setline() is invoked the undo
+				sequence will be broken.
 		See |registers| about registers.  {not in Vi}
 
 CTRL-R CTRL-R {0-9a-z"%#*+/:.-=}			*i_CTRL-R_CTRL-R*
@@ -356,10 +361,14 @@ CTRL-G CTRL-J	cursor one line down, insert start column    *i_CTRL-G_CTRL-J*
 <PageUp>	move window one page up			     *i_<PageUp>*
 <S-Down>	move window one page down		     *i_<S-Down>*
 <PageDown>	move window one page down		     *i_<PageDown>*
-<MouseDown>	scroll three lines down			     *i_<MouseDown>*
-<S-MouseDown>	scroll a full page down			     *i_<S-MouseDown>*
-<MouseUp>	scroll three lines up			     *i_<MouseUp>*
-<S-MouseUp>	scroll a full page up			     *i_<S-MouseUp>*
+<ScrollWheelDown>    move window three lines down	*i_<ScrollWheelDown>*
+<S-ScrollWheelDown>  move window one page down		*i_<S-ScrollWheelDown>*
+<ScrollWheelUp>      move window three lines up		*i_<ScrollWheelUp>*
+<S-ScrollWheelUp>    move window one page up		*i_<S-ScrollWheelUp>*
+<ScrollWheelLeft>    move window six columns left	*i_<ScrollWheelLeft>*
+<S-ScrollWheelLeft>  move window one page left		*i_<S-ScrollWheelLeft>*
+<ScrollWheelRight>   move window six columns right	*i_<ScrollWheelRight>*
+<S-ScrollWheelRight> move window one page right		*i_<S-ScrollWheelRight>*
 CTRL-O		execute one command, return to Insert mode   *i_CTRL-O*
 CTRL-\ CTRL-O	like CTRL-O but don't move the cursor	     *i_CTRL-\_CTRL-O*
 CTRL-L		when 'insertmode' is set: go to Normal mode  *i_CTRL-L*
@@ -373,7 +382,16 @@ The CTRL-O command sometimes has a side effect: If the cursor was beyond the
 end of the line, it will be put on the last character in the line.  In
 mappings it's often better to use <Esc> (first put an "x" in the text, <Esc>
 will then always put the cursor on it).  Or use CTRL-\ CTRL-O, but then
-beware of the cursor possibly being beyond the end of the line.
+beware of the cursor possibly being beyond the end of the line.  Note that the
+command following CTRL-\ CTRL-O can still move the cursor, it is not restored
+to its original position.
+
+The CTRL-O command takes you to Normal mode.  If you then use a command enter
+Insert mode again it normally doesn't nest.  Thus when typing "a<C-O>a" and
+then <Esc> takes you back to Normal mode, you do not need to type <Esc> twice.
+An exception is when not typing the command, e.g. when executing a mapping or
+sourcing a script.  This makes mappings work that briefly switch to Insert
+mode.
 
 The shifted cursor keys are not available on all terminals.
 
@@ -387,7 +405,12 @@ An example for using CTRL-G u: >
 
 This redefines the backspace key to start a new undo sequence.  You can now
 undo the effect of the backspace key, without changing what you typed before
-that, with CTRL-O u.
+that, with CTRL-O u.  Another example: >
+
+	:inoremap <CR> <C-]><C-G>u<CR>
+
+This breaks undo at each line break.  It also expands abbreviations before
+this.
 
 Using CTRL-O splits undo: the text typed before and after it is undone
 separately.  If you want to avoid this (e.g., in a mapping) you might be able
@@ -472,7 +495,7 @@ option}
 							*ins-smarttab*
 When the 'smarttab' option is on, a <Tab> inserts 'shiftwidth' positions at
 the beginning of a line and 'tabstop' positions in other places.  This means
-that often spaces instead of a <Tab> character are inserted.  When 'smarttab
+that often spaces instead of a <Tab> character are inserted.  When 'smarttab'
 is off, a <Tab> always inserts 'tabstop' positions, and 'shiftwidth' is only
 used for ">>" and the like.  {not in Vi}
 
@@ -520,7 +543,7 @@ last one).  {Vi does not have the 'expandtab' option}
 6. Virtual Replace mode		*vreplace-mode* *Virtual-Replace-mode*
 
 Enter Virtual Replace mode with the "gR" command in normal mode.
-{not available when compiled without the +vreplace feature}
+{not available when compiled without the |+vreplace| feature}
 {Vi does not have Virtual Replace mode}
 
 Virtual Replace mode is similar to Replace mode, but instead of replacing
@@ -548,12 +571,11 @@ CTRL-D, 'expandtab', 'smarttab', 'softtabstop', etc.
 In 'list' mode, Virtual Replace mode acts as if it was not in 'list' mode,
 unless "L" is in 'cpoptions'.
 
-Note that the only times characters beyond the cursor should appear to move
-are in 'list' mode, and occasionally when 'wrap' is set (and the line changes
-length to become shorter or wider than the width of the screen), or
-momentarily when typing over a CTRL character.  A CTRL character takes up two
-screen spaces.  When replacing it with two normal characters, the first will
-be inserted and the second will replace the CTRL character.
+Note that the only situations for which characters beyond the cursor should
+appear to move are in List mode |'list'|, and occasionally when 'wrap' is set
+(and the line changes length to become shorter or wider than the width of the
+screen).  In other cases spaces may be inserted to avoid following characters
+to move.
 
 This mode is very useful for editing <Tab> separated columns in tables, for
 entering new data while keeping all the columns aligned.
@@ -636,6 +658,7 @@ completion operation: >
 	      return "\<Tab>"
 	   else
 	      return "\<C-N>"
+	   endif
 	endfunction
 	inoremap <Tab> <C-R>=CleverTab()<CR>
 
@@ -660,7 +683,8 @@ CTRL-X CTRL-L		Search backwards for a line that starts with the
 
 	CTRL-X CTRL-L	After expanding a line you can additionally get the
 			line next to it by typing CTRL-X CTRL-L again, unless
-			a double CTRL-X is used.
+			a double CTRL-X is used.  Only works for loaded
+			buffers.
 
 Completing keywords in current file			*compl-current*
 
@@ -997,8 +1021,13 @@ The function must return the column where the completion starts.  It must be a
 number between zero and the cursor column "col('.')".  This involves looking
 at the characters just before the cursor and including those characters that
 could be part of the completed item.  The text between this column and the
-cursor column will be replaced with the matches.  Return -1 if no completion
-can be done.
+cursor column will be replaced with the matches.
+
+Special return values:
+   -1 If no completion can be done, the completion will be cancelled with an
+      error message.
+   -2 To cancel silently and stay in completion mode.
+   -3 To cancel silently and leave completion mode.
 
 On the second invocation the arguments are:
    a:findstart  0
@@ -1008,6 +1037,23 @@ On the second invocation the arguments are:
 The function must return a List with the matching words.  These matches
 usually include the "a:base" text.  When there are no matches return an empty
 List.
+
+In order to return more information than the matching words, return a Dict
+that contains the List.  The Dict can have these items:
+	words		The List of matching words (mandatory).
+	refresh		A string to control re-invocation of the function
+			(optional).
+			The only value currently recognized is "always", the
+			effect is that the function is called whenever the
+			leading text is changed.
+Other items are ignored.
+
+For acting upon end of completion, see the |CompleteDone| autocommand event.
+
+For example, the function can contain this: >
+	let matches = ... list of words ...
+	return {'words': matches, 'refresh': 'always'}
+<
 						*complete-items*
 Each list item can either be a string or a Dictionary.  When it is a string it
 is used as the completion.  When it is a Dictionary it can contain these
@@ -1025,17 +1071,21 @@ items:
 			items that only differ in case are added
 	dup		when non-zero this match will be added even when an
 			item with the same word is already present.
+	empty		when non-zero this match will be added even when it is
+			an empty string
 
-All of these except 'icase' must be a string.  If an item does not meet these
-requirements then an error message is given and further items in the list are
-not used.  You can mix string and Dictionary items in the returned list.
+All of these except 'icase', 'dup' and 'empty' must be a string.  If an item
+does not meet these requirements then an error message is given and further
+items in the list are not used.  You can mix string and Dictionary items in
+the returned list.
 
 The "menu" item is used in the popup menu and may be truncated, thus it should
 be relatively short.  The "info" item can be longer, it will  be displayed in
 the preview window when "preview" appears in 'completeopt'.  The "info" item
 will also remain displayed after the popup menu has been removed.  This is
 useful for function arguments.  Use a single space for "info" to remove
-existing text in the preview window.
+existing text in the preview window.  The size of the preview window is three
+lines, but 'previewheight' is used when it has a value of 1 or 2.
 
 The "kind" item uses a single letter to indicate the kind of completion.  This
 may be used to show the completion differently (different color or icon).
@@ -1051,9 +1101,9 @@ match to the total list.  These matches should then not appear in the returned
 list!  Call |complete_check()| now and then to allow the user to press a key
 while still searching for matches.  Stop searching when it returns non-zero.
 
-The function is allowed to move the cursor, it is restored afterwards.  This
-option cannot be set from a |modeline| or in the |sandbox|, for security
-reasons.
+							*E839* *E840*
+The function is allowed to move the cursor, it is restored afterwards.
+The function is not allowed to move to another window or delete text.
 
 An example that completes the names of the months: >
 	fun! CompleteMonths(findstart, base)
@@ -1309,7 +1359,7 @@ Complete:
 
 Completion works in separate JavaScript files (&ft==javascript), inside of
 <script> tag of (X)HTML and in values of event attributes (including scanning
-of external files.
+of external files).
 
 DOM compatibility
 
@@ -1353,7 +1403,7 @@ Script completes:
 - function names with additional info:
   - in case of built-in functions list of possible arguments and after | type
     data returned by function
-  - in case of user function arguments and name of file were function was
+  - in case of user function arguments and name of file where function was
     defined (if it is not current file)
 
 - constants names
@@ -1420,9 +1470,9 @@ knows how to color highlight.  It can be used for any filetype and provides a
 minimal language-sensitive completion.
 
 To enable syntax code completion you can run: >
-	setlocal omnifunc=syntaxcomplete#Complete
+    setlocal omnifunc=syntaxcomplete#Complete
 
-You can automate this by placing the following in your vimrc (after any
+You can automate this by placing the following in your |.vimrc| (after any
 ":filetype" command): >
     if has("autocmd") && exists("+omnifunc")
 	autocmd Filetype *
@@ -1439,33 +1489,46 @@ customize which syntax groups to include or exclude from the list.  Let's have
 a look at the PHP filetype to see how this works.
 
 If you edit a file called, index.php, run the following command: >
-	:syntax list
+    syntax list
 
-First thing you will notice is there are many different syntax groups.  The
-PHP language can include elements from different languages like HTML,
+The first thing you will notice is that there are many different syntax groups.
+The PHP language can include elements from different languages like HTML,
 JavaScript and many more.  The syntax plugin will only include syntax groups
 that begin with the filetype, "php", in this case.  For example these syntax
 groups are included by default with the PHP: phpEnvVar, phpIntVar,
 phpFunctions.
 
-The PHP language has an enormous number of items which it knows how to syntax
-highlight.  This means these items will be available within the omni
-completion list.  Some people may find this list unwieldy or are only
-interested in certain items.
+If you wish non-filetype syntax items to also be included, you can use a 
+regular expression syntax (added in version 13.0 of autoload\syntaxcomplete.vim)
+to add items.  Looking at the output from ":syntax list" while editing a PHP file 
+I can see some of these entries: >
+    htmlArg,htmlTag,htmlTagName,javaScriptStatement,javaScriptGlobalObjects
 
-There are two ways to prune this list (if necessary).  If you find certain
-syntax groups you do not wish displayed you can add the following to your
-vimrc: >
-	let g:omni_syntax_group_exclude_php = 'phpCoreConstant,phpConstant'
+To pick up any JavaScript and HTML keyword syntax groups while editing a PHP
+file, you can use 3 different regexs, one for each language.  Or you can 
+simply restrict the include groups to a particular value, without using 
+a regex string: >
+    let g:omni_syntax_group_include_php = 'php\w\+,javaScript\w\+,html\w\+'
+    let g:omni_syntax_group_include_php = 'phpFunctions,phpMethods'
+<
+The basic form of this variable is: >
+    let g:omni_syntax_group_include_{filetype} = 'regex,comma,separated'
+
+The PHP language has an enormous number of items which it knows how to syntax
+highlight.  These items will be available within the omni completion list.
+
+Some people may find this list unwieldy or are only interested in certain
+items.  There are two ways to prune this list (if necessary).  If you find
+certain syntax groups you do not wish displayed you can use two different 
+methods to identify these groups.  The first specifically lists the syntax 
+groups by name.  The second uses a regular expression to identify both 
+syntax groups.  Simply add one the following to your vimrc: >
+    let g:omni_syntax_group_exclude_php = 'phpCoreConstant,phpConstant'
+    let g:omni_syntax_group_exclude_php = 'php\w*Constant'
 
 Add as many syntax groups to this list by comma separating them.  The basic
 form of this variable is: >
-	let g:omni_syntax_group_exclude_{filetype} = 'comma,separated,list'
-
-For completeness the opposite is also true.  Creating this variable in your
-vimrc will only include the items in the phpFunctions and phpMethods syntax
-groups: >
-	let g:omni_syntax_group_include_php = 'phpFunctions,phpMethods'
+    let g:omni_syntax_group_exclude_{filetype} = 'regex,comma,separated'
 
 You can create as many of these variables as you need, varying only the
 filetype at the end of the variable name.
@@ -1479,6 +1542,41 @@ on word characters.   This can be controlled adding the following to your
 vimrc: >
     let g:omni_syntax_use_iskeyword = 0
 
+For plugin developers, the plugin exposes a public function OmniSyntaxList.
+This function can be used to request a List of syntax items.  When editing a
+SQL file (:e syntax.sql) you can use the ":syntax list" command to see the 
+various groups and syntax items.  For example: >
+    syntax list 
+
+Yields data similar to this: >
+    sqlOperator    xxx some prior all like and any escape exists in is not 
+                       or intersect minus between distinct
+                       links to Operator
+    sqlType        xxx varbit varchar nvarchar bigint int uniqueidentifier 
+                       date money long tinyint unsigned xml text smalldate 
+                       double datetime nchar smallint numeric time bit char 
+                       varbinary binary smallmoney
+                       image float integer timestamp real decimal
+
+There are two syntax groups listed here: sqlOperator and sqlType.  To retrieve
+a List of syntax items you can call OmniSyntaxList a number of different 
+ways.  To retrieve all syntax items regardless of syntax group:  >
+    echo OmniSyntaxList( [] )
+
+To retrieve only the syntax items for the sqlOperator syntax group: >
+    echo OmniSyntaxList( ['sqlOperator'] )
+
+To retrieve all syntax items for both the sqlOperator and sqlType groups: >
+    echo OmniSyntaxList( ['sqlOperator', 'sqlType'] )
+
+A regular expression can also be used: >
+    echo OmniSyntaxList( ['sql\w\+'] )
+
+From within a plugin, you would typically assign the output to a List: >
+    let myKeywords = []
+    let myKeywords = OmniSyntaxList( ['sqlKeyword'] )
+
+    
 
 SQL							*ft-sql-omni*
 
@@ -1488,7 +1586,7 @@ with data pulled directly from within a database.  For detailed instructions
 and a tutorial see |omni-sql-completion|.
 
 The SQL completion plugin can be used in conjunction with other completion
-plugins.  For example, the PHP filetype has it's own completion plugin.
+plugins.  For example, the PHP filetype has its own completion plugin.
 Since PHP is often used to generate dynamic website by accessing a database,
 the SQL completion plugin can also be enabled.  This allows you to complete
 PHP code and SQL code at the same time.
@@ -1725,14 +1823,14 @@ too long when appending characters a line break is automatically inserted.
 These two commands will keep on asking for lines, until you type a line
 containing only a ".".  Watch out for lines starting with a backslash, see
 |line-continuation|.
-When these commands are used with |:global| or |:vglobal| then the lines are
-obtained from the text following the command.  Separate lines with a NL
-escaped with a backslash: >
-	:global/abc/insert\
-	one line\
-	another line
-The final "." is not needed then.
-NOTE: ":append" and ":insert" don't work properly in between ":if" and
+
+When in Ex mode (see |-e|) a backslash at the end of the line can be used to
+insert a NUL character.  To be able to have a line ending in a backslash use
+two backslashes.  This means that the number of backslashes is halved, but
+only at the end of the line.
+
+NOTE: These commands cannot be used with |:global| or |:vglobal|.
+":append" and ":insert" don't work properly in between ":if" and
 ":endif", ":for" and ":endfor", ":while" and ":endwhile".
 
 							*:start* *:startinsert*
@@ -1745,7 +1843,7 @@ NOTE: ":append" and ":insert" don't work properly in between ":if" and
 			or script is finished.
 			This command does not work from |:normal|.
 			{not in Vi}
-			{not available when compiled without the +ex_extra
+			{not available when compiled without the |+ex_extra|
 			feature}
 
 							*:stopi* *:stopinsert*
@@ -1764,14 +1862,14 @@ NOTE: ":append" and ":insert" don't work properly in between ":if" and
 			script that the replacement will only start after
 			the function or script is finished.
 			{not in Vi}
-			{not available when compiled without the +ex_extra
+			{not available when compiled without the |+ex_extra|
 			feature}
 
 							*:startgreplace*
 :startg[replace][!]	Just like |:startreplace|, but use Virtual Replace
 			mode, like with |gR|.
 			{not in Vi}
-			{not available when compiled without the +ex_extra
+			{not available when compiled without the |+ex_extra|
 			feature}
 
 ==============================================================================
@@ -1789,13 +1887,15 @@ NOTE: ":append" and ":insert" don't work properly in between ":if" and
 			See |++opt| for the possible values of [++opt].
 
 							*:r!* *:read!*
-:[range]r[ead] !{cmd}	Execute {cmd} and insert its standard output below
+:[range]r[ead] [++opt] !{cmd}
+			Execute {cmd} and insert its standard output below
 			the cursor or the specified line.  A temporary file is
 			used to store the output of the command which is then
 			read into the buffer.  'shellredir' is used to save
 			the output of the command, which can be set to include
 			stderr or not.  {cmd} is executed like with ":!{cmd}",
 			any '!' is replaced with the previous command |:!|.
+			See |++opt| for the possible values of [++opt].
 
 These commands insert the contents of a file, or the output of a command,
 into the buffer.  They can be undone.  They cannot be repeated with the "."

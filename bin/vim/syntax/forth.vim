@@ -1,13 +1,13 @@
 " Vim syntax file
 " Language:    FORTH
 " Maintainer:  Christian V. J. Brüssow <cvjb@cvjb.de>
-" Last Change: Sa 09 Feb 2008 13:27:29 CET
+" Last Change: So 27 Mai 2012 15:56:28 CEST
 " Filenames:   *.fs,*.ft
 " URL:	       http://www.cvjb.de/comp/vim/forth.vim
 
-" $Id: forth.vim,v 1.7 2008/08/09 17:45:16 vimboss Exp $
+" $Id: forth.vim,v 1.14 2012/05/27 15:57:22 bruessow Exp $
 
-" The list of keywords is incomplete, compared with the offical ANS
+" The list of keywords is incomplete, compared with the official ANS
 " wordlist. If you use this language, please improve it, and send me
 " the patches.
 "
@@ -16,6 +16,19 @@
 " for forth.vim).
 
 " Many Thanks to...
+"
+" 2012-05-13:
+" Dominique Pellé <dominique dot pelle at gmail dot com> for sending the
+" patch to allow spellchecking of strings, comments, ...
+" 
+" 2012-01-07:
+" Thilo Six <T.Six at gmx dot de> send a patch for cpoptions.
+" See the discussion at http://thread.gmane.org/gmane.editors.vim.devel/32151
+"
+" 2009-06-28:
+" Josh Grams send a patch to allow the parenthesis comments at the
+" beginning of a line. That patch also fixed a typo in one of the
+" comments.
 "
 " 2008-02-09:
 " Shawn K. Quinn <sjquinn at speakeasy dot net> send a big patch with
@@ -35,14 +48,14 @@
 " Bill McCarthy <WJMc@...> and Ilya Sher <ilya-vim@...>
 " Who found a bug in the ccomment line in 2004!!!
 " I'm really very sorry, that it has taken two years to fix that
-" in the offical version of this file. Shame on me.
+" in the official version of this file. Shame on me.
 " I think my face will be red the next ten years...
 "
 " 2006-05-21:
 " Thomas E. Vaughan <tevaugha at ball dot com> send me a patch
 " for the parenthesis comment word, so words with a trailing
 " parenthesis will not start the highlighting for such comments.
-" 
+"
 " 2003-05-10:
 " Andrew Gaul <andrew at gaul.org> send me a patch for
 " forthOperators.
@@ -74,6 +87,9 @@ if version < 600
 elseif exists("b:current_syntax")
     finish
 endif
+
+let s:cpo_save = &cpo
+set cpo&vim
 
 " Synchronization method
 syn sync ccomment
@@ -120,7 +136,7 @@ syn keyword forthOperators F~REL F~ABS F~
 syn keyword forthOperators 0< 0<= 0<> 0= 0> 0>= < <= <> = > >= U< U<=
 syn keyword forthOperators U> U>= D0< D0<= D0<> D0= D0> D0>= D< D<= D<>
 syn keyword forthOperators D= D> D>= DU< DU<= DU> DU>= WITHIN ?NEGATE
-syn keyword forthOperators ?DNEGATE 
+syn keyword forthOperators ?DNEGATE
 
 " stack manipulations
 syn keyword forthStack DROP NIP DUP OVER TUCK SWAP ROT -ROT ?DUP PICK ROLL
@@ -166,7 +182,7 @@ syn keyword forthDefine LITERAL CREATE-INTERPRET/COMPILE INTERPRETATION>
 syn keyword forthDefine <INTERPRETATION COMPILATION> <COMPILATION ] LASTXT
 syn keyword forthDefine COMP' POSTPONE, FIND-NAME NAME>INT NAME?INT NAME>COMP
 syn keyword forthDefine NAME>STRING STATE C; CVARIABLE
-syn keyword forthDefine , 2, F, C, 
+syn keyword forthDefine , 2, F, C,
 syn match forthDefine "\[IFDEF]"
 syn match forthDefine "\[IFUNDEF]"
 syn match forthDefine "\[THEN]"
@@ -205,11 +221,11 @@ syn match forthCharOps '\<\[char\]\s\S\s'
 syn region forthCharOps start=+."\s+ skip=+\\"+ end=+"+
 
 " char-number conversion
-syn keyword forthConversion <<# <# # #> #>> #S (NUMBER) (NUMBER?) CONVERT D>F 
+syn keyword forthConversion <<# <# # #> #>> #S (NUMBER) (NUMBER?) CONVERT D>F
 syn keyword forthConversion D>S DIGIT DPL F>D HLD HOLD NUMBER S>D SIGN >NUMBER
 syn keyword forthConversion F>S S>F
 
-" interptreter, wordbook, compiler
+" interpreter, wordbook, compiler
 syn keyword forthForth (LOCAL) BYE COLD ABORT >BODY >NEXT >LINK CFA >VIEW HERE
 syn keyword forthForth PAD WORDS VIEW VIEW> N>LINK NAME> LINK> L>NAME FORGET
 syn keyword forthForth BODY> ASSERT( ASSERT0( ASSERT1( ASSERT2( ASSERT3( )
@@ -220,7 +236,7 @@ syn keyword forthVocs ONLY FORTH ALSO ROOT SEAL VOCS ORDER CONTEXT #VOCS
 syn keyword forthVocs VOCABULARY DEFINITIONS
 
 " File keywords
-syn keyword forthFileMode R/O R/W W/O BIN 
+syn keyword forthFileMode R/O R/W W/O BIN
 syn keyword forthFileWords OPEN-FILE CREATE-FILE CLOSE-FILE DELETE-FILE
 syn keyword forthFileWords RENAME-FILE READ-FILE READ-LINE KEY-FILE
 syn keyword forthFileWords KEY?-FILE WRITE-FILE WRITE-LINE EMIT-FILE
@@ -244,22 +260,22 @@ syn match forthInteger '\<%[0-1]*[0-1]\+\>'
 syn match forthFloat '\<-\=\d*[.]\=\d\+[DdEe]\d\+\>'
 syn match forthFloat '\<-\=\d*[.]\=\d\+[DdEe][-+]\d\+\>'
 
-" XXX If you find this overkill you can remove it. this has to come after the
+" XXX If you find this overkill you can remove it. This has to come after the
 " highlighting for numbers otherwise it has no effect.
 syn region forthComment start='0 \[if\]' end='\[endif\]' end='\[then\]' contains=forthTodo
 
 " Strings
-syn region forthString start=+\.*\"+ end=+"+ end=+$+
+syn region forthString start=+\.*\"+ end=+"+ end=+$+ contains=@Spell
 " XXX
-syn region forthString start=+s\"+ end=+"+ end=+$+
-syn region forthString start=+c\"+ end=+"+ end=+$+
+syn region forthString start=+s\"+ end=+"+ end=+$+ contains=@Spell
+syn region forthString start=+c\"+ end=+"+ end=+$+ contains=@Spell
 
 " Comments
-syn match forthComment '\\\s.*$' contains=forthTodo,forthSpaceError
-syn region forthComment start='\\S\s' end='.*' contains=forthTodo,forthSpaceError
-syn match forthComment '\.(\s[^)]*)' contains=forthTodo,forthSpaceError
-syn region forthComment start='\s(\s' skip='\\)' end=')' contains=forthTodo,forthSpaceError
-syn region forthComment start='/\*' end='\*/' contains=forthTodo,forthSpaceError
+syn match forthComment '\\\s.*$' contains=@Spell,forthTodo,forthSpaceError
+syn region forthComment start='\\S\s' end='.*' contains=@Spell,forthTodo,forthSpaceError
+syn match forthComment '\.(\s[^)]*)' contains=@Spell,forthTodo,forthSpaceError
+syn region forthComment start='\(^\|\s\)\zs(\s' skip='\\)' end=')' contains=@Spell,forthTodo,forthSpaceError
+syn region forthComment start='/\*' end='\*/' contains=@Spell,forthTodo,forthSpaceError
 
 " Include files
 syn match forthInclude '^INCLUDE\s\+\k\+'
@@ -283,7 +299,7 @@ if version >= 508 || !exists("did_forth_syn_inits")
 	command -nargs=+ HiLink hi def link <args>
     endif
 
-    " The default methods for highlighting. Can be overriden later.
+    " The default methods for highlighting. Can be overridden later.
     HiLink forthTodo Todo
     HiLink forthOperators Operator
     HiLink forthMath Number
@@ -326,4 +342,6 @@ endif
 
 let b:current_syntax = "forth"
 
+let &cpo = s:cpo_save
+unlet s:cpo_save
 " vim:ts=8:sw=4:nocindent:smartindent:

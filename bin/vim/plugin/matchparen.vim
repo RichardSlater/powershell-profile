@@ -1,19 +1,29 @@
 " Vim plugin for showing matching parens
 " Maintainer:  Bram Moolenaar <Bram@vim.org>
-" Last Change: 2008 Feb 27
+" Last Change: 2013 May 08
 
 " Exit quickly when:
 " - this plugin was already loaded (or disabled)
 " - when 'compatible' is set
-" - the "CursorMoved" autocmd event is not availble.
+" - the "CursorMoved" autocmd event is not available.
 if exists("g:loaded_matchparen") || &cp || !exists("##CursorMoved")
   finish
 endif
 let g:loaded_matchparen = 1
 
+if !exists("g:matchparen_timeout")
+  let g:matchparen_timeout = 300
+endif
+if !exists("g:matchparen_insert_timeout")
+  let g:matchparen_insert_timeout = 60
+endif
+
 augroup matchparen
   " Replace all matchparen autocommands
   autocmd! CursorMoved,CursorMovedI,WinEnter * call s:Highlight_Matching_Pair()
+  if exists('##TextChanged')
+    autocmd! TextChanged,TextChangedI * call s:Highlight_Matching_Pair()
+  endif
 augroup END
 
 " Skip the rest if it was already done.
@@ -21,7 +31,7 @@ if exists("*s:Highlight_Matching_Pair")
   finish
 endif
 
-let cpo_save = &cpo
+let s:cpo_save = &cpo
 set cpo-=C
 
 " The function that is invoked (very often) to define a ":match" highlighting
@@ -82,8 +92,9 @@ function! s:Highlight_Matching_Pair()
   endif
 
   " When not in a string or comment ignore matches inside them.
+  " We match "escape" for special items, such as lispEscapeSpecial.
   let s_skip ='synIDattr(synID(line("."), col("."), 0), "name") ' .
-	\ '=~?  "string\\|character\\|singlequote\\|comment"'
+	\ '=~?  "string\\|character\\|singlequote\\|escape\\|comment"'
   execute 'if' s_skip '| let s_skip = 0 | endif'
 
   " Limit the search to lines visible in the window.
@@ -95,10 +106,15 @@ function! s:Highlight_Matching_Pair()
     let stopline = stoplinetop
   endif
 
+  " Limit the search time to 300 msec to avoid a hang on very long lines.
+  " This fails when a timeout is not supported.
+  if mode() == 'i' || mode() == 'R'
+    let timeout = exists("b:matchparen_insert_timeout") ? b:matchparen_insert_timeout : g:matchparen_insert_timeout
+  else
+    let timeout = exists("b:matchparen_timeout") ? b:matchparen_timeout : g:matchparen_timeout
+  endif
   try
-    " Limit the search time to 300 msec to avoid a hang on very long lines.
-    " This fails when a timeout is not supported.
-    let [m_lnum, m_col] = searchpairpos(c, '', c2, s_flags, s_skip, stopline, 300)
+    let [m_lnum, m_col] = searchpairpos(c, '', c2, s_flags, s_skip, stopline, timeout)
   catch /E118/
     " Can't use the timeout, restrict the stopline a bit more to avoid taking
     " a long time on closed folds and long lines.
@@ -147,4 +163,5 @@ command! NoMatchParen windo 3match none | unlet! g:loaded_matchparen |
 	  \ au! matchparen
 command! DoMatchParen runtime plugin/matchparen.vim | windo doau CursorMoved
 
-let &cpo = cpo_save
+let &cpo = s:cpo_save
+unlet s:cpo_save

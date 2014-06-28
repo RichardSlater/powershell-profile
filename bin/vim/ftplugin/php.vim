@@ -1,15 +1,15 @@
 " Vim filetype plugin file
 " Language:	php
-" Maintainer:	Dan Sharp <dwsharp at hotmail dot com>
-" Last Changed: 2007 Nov 10
-" URL:		http://mywebpage.netscape.com/sharppeople/vim/ftplugin
+" Maintainer:	Dan Sharp <dwsharp at users dot sourceforge dot net>
+" Last Changed: 20 Jan 2009
+" URL:		http://dwsharp.users.sourceforge.net/vim/ftplugin
 
 if exists("b:did_ftplugin") | finish | endif
 
 " Make sure the continuation lines below do not cause problems in
 " compatibility mode.
-let s:save_cpo = &cpo
-set cpo-=C
+let s:keepcpo= &cpo
+set cpo&vim
 
 " Define some defaults in case the included ftplugins don't set them.
 let s:undo_ftplugin = ""
@@ -79,4 +79,5 @@ let b:undo_ftplugin = "setlocal commentstring< include< omnifunc<" .
 	    \	      s:undo_ftplugin
 
 " Restore the saved compatibility options.
-let &cpo = s:save_cpo
+let &cpo = s:keepcpo
+unlet s:keepcpo

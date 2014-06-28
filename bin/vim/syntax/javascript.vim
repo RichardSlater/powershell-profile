@@ -7,7 +7,8 @@
 "		(ss) repaired several quoting and grouping glitches
 "		(ss) fixed regex parsing issue with multiple qualifiers [gi]
 "		(ss) additional factoring of keywords, globals, and members
-" Last Change:	2006 Jun 19
+" Last Change:	2012 Oct 05
+" 		2013 Jun 12: adjusted javaScriptRegexpString (Kevin Locke)
 
 " For version 5.x: Clear all syntax items
 " For version 6.x: Quit when a syntax file was already loaded
@@ -21,14 +22,17 @@ if !exists("main_syntax")
     finish
   endif
   let main_syntax = 'javascript'
+elseif exists("b:current_syntax") && b:current_syntax == "javascript"
+  finish
 endif
+
+let s:cpo_save = &cpo
+set cpo&vim
 
 " Drop fold if it set but vim doesn't support it.
 if version < 600 && exists("javaScript_fold")
   unlet javaScript_fold
 endif
-
-syn case ignore
 
 
 syn keyword javaScriptCommentTodo      TODO FIXME XXX TBD contained
@@ -36,12 +40,12 @@ syn match   javaScriptLineComment      "\/\/.*" contains=@Spell,javaScriptCommen
 syn match   javaScriptCommentSkip      "^[ \t]*\*\($\|[ \t]\+\)"
 syn region  javaScriptComment	       start="/\*"  end="\*/" contains=@Spell,javaScriptCommentTodo
 syn match   javaScriptSpecial	       "\\\d\d\d\|\\."
-syn region  javaScriptStringD	       start=+"+  skip=+\\\\\|\\"+  end=+"\|$+  contains=javaScriptSpecial,@htmlPreproc
-syn region  javaScriptStringS	       start=+'+  skip=+\\\\\|\\'+  end=+'\|$+  contains=javaScriptSpecial,@htmlPreproc
+syn region  javaScriptStringD	       start=+"+  skip=+\\\\\|\\"+  end=+"\|$+	contains=javaScriptSpecial,@htmlPreproc
+syn region  javaScriptStringS	       start=+'+  skip=+\\\\\|\\'+  end=+'\|$+	contains=javaScriptSpecial,@htmlPreproc
 
 syn match   javaScriptSpecialCharacter "'\\.'"
 syn match   javaScriptNumber	       "-\=\<\d\+L\=\>\|0[xX][0-9a-fA-F]\+\>"
-syn region  javaScriptRegexpString     start=+/[^/*]+me=e-1 skip=+\\\\\|\\/+ end=+/[gi]\{0,2\}\s*$+ end=+/[gi]\{0,2\}\s*[;.,)\]}]+me=e-1 contains=@htmlPreproc oneline
+syn region  javaScriptRegexpString     start=+/[^/*]+me=e-1 skip=+\\\\\|\\/+ end=+/[gim]\{0,2\}\s*$+ end=+/[gim]\{0,2\}\s*[;.,)\]}]+me=e-1 contains=@htmlPreproc oneline
 
 syn keyword javaScriptConditional	if else switch
 syn keyword javaScriptRepeat		while for do in
@@ -51,7 +55,7 @@ syn keyword javaScriptType		Array Boolean Date Function Number Object String Reg
 syn keyword javaScriptStatement		return with
 syn keyword javaScriptBoolean		true false
 syn keyword javaScriptNull		null undefined
-syn keyword javaScriptIdentifier	arguments this var
+syn keyword javaScriptIdentifier	arguments this var let
 syn keyword javaScriptLabel		case default
 syn keyword javaScriptException		try catch finally throw
 syn keyword javaScriptMessage		alert confirm prompt status
@@ -61,7 +65,7 @@ syn keyword javaScriptDeprecated	escape unescape
 syn keyword javaScriptReserved		abstract boolean byte char class const debugger double enum export extends final float goto implements import int interface long native package private protected public short static super synchronized throws transient volatile 
 
 if exists("javaScript_fold")
-    syn match	javaScriptFunction      "\<function\>"
+    syn match	javaScriptFunction	"\<function\>"
     syn region	javaScriptFunctionFold	start="\<function\>.*[^};]$" end="^\z1}.*$" transparent fold keepend
 
     syn sync match javaScriptSync	grouphere javaScriptFunctionFold "\<function\>"
@@ -70,7 +74,7 @@ if exists("javaScript_fold")
     setlocal foldmethod=syntax
     setlocal foldtext=getline(v:foldstart)
 else
-    syn keyword	javaScriptFunction      function
+    syn keyword javaScriptFunction	function
     syn match	javaScriptBraces	   "[{}\[\]]"
     syn match	javaScriptParens	   "[()]"
 endif
@@ -133,5 +137,7 @@ let b:current_syntax = "javascript"
 if main_syntax == 'javascript'
   unlet main_syntax
 endif
+let &cpo = s:cpo_save
+unlet s:cpo_save
 
 " vim: ts=8

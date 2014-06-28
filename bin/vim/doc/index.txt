@@ -1,4 +1,4 @@
-*index.txt*     For Vim version 7.2.  Last change: 2008 May 04
+*index.txt*     For Vim version 7.4.  Last change: 2013 Jul 17
 
 
 		  VIM REFERENCE MANUAL    by Bram Moolenaar
@@ -29,7 +29,7 @@ For a complete listing of all help items see |help-tags|.
 ==============================================================================
 1. Insert mode						*insert-index*
 
-tag		char		action	~
+tag		char		action in Insert mode	~
 -----------------------------------------------------------------------
 |i_CTRL-@|	CTRL-@		insert previously inserted text and stop
 				insert
@@ -94,15 +94,15 @@ tag		char		action	~
 |i_CTRL-Z|	CTRL-Z		when 'insertmode' set: suspend Vim
 |i_<Esc>|	<Esc>		end insert mode (unless 'insertmode' set)
 |i_CTRL-[|	CTRL-[		same as <Esc>
-|i_CTRL-\_CTRL-N| CTRL-\ CTRL-N	 go to Normal mode
-|i_CTRL-\_CTRL-G| CTRL-\ CTRL-G	 go to mode specified with 'insertmode'
+|i_CTRL-\_CTRL-N| CTRL-\ CTRL-N	go to Normal mode
+|i_CTRL-\_CTRL-G| CTRL-\ CTRL-G	go to mode specified with 'insertmode'
 		CTRL-\ a - z	reserved for extensions
 		CTRL-\ others	not used
 |i_CTRL-]|	CTRL-]		trigger abbreviation
 |i_CTRL-^|	CTRL-^		toggle use of |:lmap| mappings
 |i_CTRL-_|	CTRL-_		When 'allowrevins' set: change language
 				(Hebrew, Farsi) {only when compiled with
-				+rightleft feature}
+				the |+rightleft| feature}
 
 		<Space> to '~'	not used, except '0' and '^' followed by
 				CTRL-D
@@ -136,10 +136,14 @@ tag		char		action	~
 |i_<Help>|	<Help>		stop insert mode and display help window
 |i_<Insert>|	<Insert>	toggle Insert/Replace mode
 |i_<LeftMouse>|	<LeftMouse>	cursor at mouse click
-|i_<MouseDown>|	<MouseDown>	scroll three lines downwards
-|i_<S-MouseDown>| <S-MouseDown>	scroll a full page downwards
-|i_<MouseUp>|	<MouseUp>	scroll three lines upwards
-|i_<S-MouseUp>|	<S-MouseUp>	scroll a full page upwards
+|i_<ScrollWheelDown>|	<ScrollWheelDown>	move window three lines down
+|i_<S-ScrollWheelDown>|	<S-ScrollWheelDown>	move window one page down
+|i_<ScrollWheelUp>|	<ScrollWheelUp>		move window three lines up
+|i_<S-ScrollWheelUp>|	<S-ScrollWheelUp>	move window one page up
+|i_<ScrollWheelLeft>|	<ScrollWheelLeft>	move window six columns left
+|i_<S-ScrollWheelLeft>|	<S-ScrollWheelLeft>	move window one page left
+|i_<ScrollWheelRight>|	<ScrollWheelRight>	move window six columns right
+|i_<S-ScrollWheelRight>| <S-ScrollWheelRight>	move window one page right
 
 commands in CTRL-X submode				*i_CTRL-X_index*
 
@@ -159,7 +163,7 @@ commands in CTRL-X submode				*i_CTRL-X_index*
 |i_CTRL-X_CTRL-V|	CTRL-X CTRL-V	complete like in : command line
 |i_CTRL-X_CTRL-]|	CTRL-X CTRL-]	complete tags
 |i_CTRL-X_s|		CTRL-X s	spelling suggestions
-{not available when compiled without the +insert_expand feature}
+{not available when compiled without the |+insert_expand| feature}
 
 ==============================================================================
 2. Normal mode						*normal-index*
@@ -208,8 +212,8 @@ tag		char	      note action in Normal mode	~
 |CTRL-Y|	CTRL-Y		   scroll N lines downwards
 |CTRL-Z|	CTRL-Z		   suspend program (or start new shell)
 		CTRL-[ <Esc>	   not used
-|CTRL-\_CTRL-N| CTRL-\ CTRL-N	   go to Normal mode (no-op)
-|CTRL-\_CTRL-G| CTRL-\ CTRL-G	   go to mode specified with 'insertmode'
+|CTRL-\_CTRL-N|	CTRL-\ CTRL-N	   go to Normal mode (no-op)
+|CTRL-\_CTRL-G|	CTRL-\ CTRL-G	   go to mode specified with 'insertmode'
 		CTRL-\ a - z	   reserved for extensions
 		CTRL-\ others      not used
 |CTRL-]|	CTRL-]		   :ta to ident under cursor
@@ -427,7 +431,7 @@ tag		char	      note action in Normal mode	~
 |<Insert>|	<Insert>	2  same as "i"
 |<Left>|	<Left>		1  same as "h"
 |<LeftMouse>|	<LeftMouse>	1  move cursor to the mouse click position
-|<MiddleMouse>| <MiddleMouse>	2  same as "gP" at the mouse click position
+|<MiddleMouse>|	<MiddleMouse>	2  same as "gP" at the mouse click position
 |<PageDown>|	<PageDown>	   same as CTRL-F
 |<PageUp>|	<PageUp>	   same as CTRL-B
 |<Right>|	<Right>		1  same as "l"
@@ -441,17 +445,21 @@ tag		char	      note action in Normal mode	~
 |<S-Up>|	<S-Up>		1  same as CTRL-B
 |<Undo>|	<Undo>		2  same as "u"
 |<Up>|		<Up>		1  same as "k"
-|<MouseDown>|	<MouseDown>	   scroll three lines downwards
-|<S-MouseDown>|	<S-MouseDown>	   scroll a full page downwards
-|<MouseUp>|	<MouseUp>	   scroll three lines upwards
-|<S-MouseUp>|	<S-MouseUp>	   scroll a full page upwards
+|<ScrollWheelDown>|	<ScrollWheelDown>	move window three lines down
+|<S-ScrollWheelDown>|	<S-ScrollWheelDown>	move window one page down
+|<ScrollWheelUp>|	<ScrollWheelUp>		move window three lines up
+|<S-ScrollWheelUp>|	<S-ScrollWheelUp>	move window one page up
+|<ScrollWheelLeft>|	<ScrollWheelLeft>	move window six columns left
+|<S-ScrollWheelLeft>|	<S-ScrollWheelLeft>	move window one page left
+|<ScrollWheelRight>|	<ScrollWheelRight>	move window six columns right
+|<S-ScrollWheelRight>|	<S-ScrollWheelRight>	move window one page right
 
 ==============================================================================
 2.1 Text objects						*objects*
 
 These can be used after an operator or in Visual mode to select an object.
 
-tag		command		   action in Normal mode	~
+tag		command		   action in op-pending and Visual mode	~
 ------------------------------------------------------------------------------
 |v_aquote|	a"		   double quoted string
 |v_a'|		a'		   single quoted string
@@ -522,7 +530,7 @@ tag		command		   action in Normal mode	~
 |CTRL-W_+|	CTRL-W +	   increase current window height N lines
 |CTRL-W_-|	CTRL-W -	   decrease current window height N lines
 |CTRL-W_<|	CTRL-W <	   decrease current window width N columns
-|CTRL-W_=|	CTRL-W =	   make all windows the same height
+|CTRL-W_=|	CTRL-W =	   make all windows the same height & width
 |CTRL-W_>|	CTRL-W >	   increase current window width N columns
 |CTRL-W_H|	CTRL-W H	   move current window to the far left
 |CTRL-W_J|	CTRL-W J	   move current window to the very bottom
@@ -572,7 +580,7 @@ tag		command		   action in Normal mode	~
 				   window N lines high
 |CTRL-W_t|	CTRL-W t	   go to top window
 |CTRL-W_v|	CTRL-W v	   split current window vertically, new window
-				   N lines wide
+				   N columns wide
 |CTRL-W_w|	CTRL-W w	   go to N next window (wrap around)
 |CTRL-W_x|	CTRL-W x	   exchange current window with window N
 				   (default: next window)
@@ -632,7 +640,7 @@ tag		char	      note action in Normal mode	~
 |[s|		[s		1  move to the previous misspelled word
 |[z|		[z		1  move to start of open fold
 |[{|		[{		1  cursor N times back to unmatched '{'
-|[<MiddleMouse> [<MiddleMouse>	2  same as "[p"
+|[<MiddleMouse>| [<MiddleMouse>	2  same as "[p"
 
 |]_CTRL-D|	] CTRL-D	   jump to first #define found in current and
 				   included files matching the word under the
@@ -672,7 +680,7 @@ tag		char	      note action in Normal mode	~
 |]s|		]s		1  move to next misspelled word
 |]z|		]z		1  move to end of open fold
 |]}|		]}		1  cursor N times forward to unmatched '}'
-|]<MiddleMouse> ]<MiddleMouse>	2  same as "]p"
+|]<MiddleMouse>| ]<MiddleMouse>	2  same as "]p"
 
 ==============================================================================
 2.4 Commands starting with 'g'						*g*
@@ -711,9 +719,13 @@ tag		char	      note action in Normal mode	~
 |gH|		gH		   start Select line mode
 |gI|		gI		2  like "I", but always start in column 1
 |gJ|		gJ		2  join lines without inserting space
+|gN|		gN	      1,2  find the previous match with the last used
+				   search pattern and Visually select it
 |gP|		["x]gP		2  put the text [from register x] before the
 				   cursor N times, leave the cursor after it
+|gQ|		gQ		    switch to "Ex" mode with Vim editing
 |gR|		gR		2  enter Virtual Replace mode
+|gT|		gT		   go to the previous tab page
 |gU|		gU{motion}	2  make Nmove text uppercase
 |gV|		gV		   don't reselect the previous Visual area
 				   when executing a mapping or menu in Select
@@ -742,6 +754,8 @@ tag		char	      note action in Normal mode	~
 				   lines down
 |gk|		gk		1  like "k", but when 'wrap' on go N screen
 				   lines up
+|gn|		gn	      1,2  find the next match with the last used
+				   search pattern and Visually select it
 |gm|		gm		1  go to character at middle of the screenline
 |go|		go		1  cursor to byte N in the buffer
 |gp|		["x]gp		2  put the text [from register x] after the
@@ -749,6 +763,7 @@ tag		char	      note action in Normal mode	~
 |gq|		gq{motion}	2  format Nmove text
 |gr|		gr{char}	2  virtual replace N chars with {char}
 |gs|		gs		   go to sleep for N seconds (default 1)
+|gt|		gt		   go to the next tab page
 |gu|		gu{motion}	2  make Nmove text lowercase
 |gv|		gv		   reselect the previous Visual area
 |gw|		gw{motion}	2  format Nmove text and keep cursor
@@ -786,6 +801,10 @@ tag		char	      note action in Normal mode	~
 |zE|		zE		   eliminate all folds
 |zF|		zF		   create a fold for N lines
 |zG|		zG		   mark word as good spelled word
+|zH|		zH		   when 'wrap' off scroll half a screenwidth
+				   to the right
+|zL|		zL		   when 'wrap' off scroll half a screenwidth
+				   to the left
 |zM|		zM		   set 'foldlevel' to zero
 |zN|		zN		   set 'foldenable'
 |zO|		zO		   open folds recursively
@@ -943,11 +962,13 @@ Normal characters are inserted at the current cursor position.
 "Completion" below refers to context-sensitive completion.  It will complete
 file names, tags, commands etc. as appropriate.
 
+tag		command	      action in Command-line editing mode	~
+------------------------------------------------------------------------------
 		CTRL-@		not used
 |c_CTRL-A|	CTRL-A		do completion on the pattern in front of the
 				cursor and insert all matches
 |c_CTRL-B|	CTRL-B		cursor to begin of command-line
-|c_CTRL-C|	CTRL-C		same as <ESC>
+|c_CTRL-C|	CTRL-C		same as <Esc>
 |c_CTRL-D|	CTRL-D		list completions that match the pattern in
 				front of the cursor
 |c_CTRL-E|	CTRL-E		cursor to end of command-line
@@ -996,8 +1017,8 @@ file names, tags, commands etc. as appropriate.
 		CTRL-Z		not used (reserved for suspend)
 |c_<Esc>|	<Esc>		abandon command-line without executing it
 |c_<Esc>|	CTRL-[		same as <Esc>
-|c_CTRL-\_CTRL-N| CTRL-\ CTRL-N	 go to Normal mode, abandon command-line
-|c_CTRL-\_CTRL-G| CTRL-\ CTRL-G	 go to mode specified with 'insertmode',
+|c_CTRL-\_CTRL-N| CTRL-\ CTRL-N	go to Normal mode, abandon command-line
+|c_CTRL-\_CTRL-G| CTRL-\ CTRL-G	go to mode specified with 'insertmode',
 				abandon command-line
 		CTRL-\ a - d	reserved for extensions
 |c_CTRL-\_e|	CTRL-\ e {expr} replace the command line with the result of
@@ -1038,6 +1059,8 @@ This is a brief but complete listing of all the ":" commands, without
 mentioning any arguments.  The optional part of the command name is inside [].
 The commands are sorted on the non-optional part of their name.
 
+tag	      command	      action ~
+------------------------------------------------------------------------------
 |:!|		:!		filter lines or execute an external command
 |:!!|		:!!		repeat last ":!" command
 |:#|		:#		same as ":number"
@@ -1117,7 +1140,7 @@ The commands are sorted on the non-optional part of their name.
 |:cgetbuffer|	:cgetb[uffer]	get errors from buffer
 |:cgetexpr|	:cgete[xpr]	get errors from expr
 |:cgetfile|	:cg[etfile]	read file with error messages
-|:changes|	:cha[nges]	print the change list
+|:changes|	:changes	print the change list
 |:chdir|	:chd[ir]	change directory
 |:checkpath|	:che[ckpath]	list included files
 |:checktime|	:checkt[ime]	check timestamp of loaded buffers
@@ -1168,9 +1191,12 @@ The commands are sorted on the non-optional part of their name.
 |:digraphs|	:dig[raphs]	show or enter digraphs
 |:display|	:di[splay]	display registers
 |:djump|	:dj[ump]	jump to #define
-|:dlist|	:dl[ist]	list #defines
+|:dl|		:dl		short for |:delete|
+|:dl|		:del[ete]l	short for |:delete|
+|:dlist|	:dli[st]	list #defines
 |:doautocmd|	:do[autocmd]	apply autocommands to current buffer
 |:doautoall|	:doautoa[ll]	apply autocommands for all loaded buffers
+|:dp|		:d[elete]p	short for |:delete|
 |:drop|		:dr[op]		jump to window editing file or edit file in
 				current window
 |:dsearch|	:ds[earch]	list one #define
@@ -1248,7 +1274,7 @@ The commands are sorted on the non-optional part of their name.
 |:k|		:k		set a mark
 |:keepalt|	:keepa[lt]	following command keeps the alternate file
 |:keepmarks|	:kee[pmarks]	following command keeps marks where they are
-|:keepjumps|	:keepj[jumps]	following command keeps jumplist and marks
+|:keepjumps|	:keepj[umps]	following command keeps jumplist and marks
 |:lNext|	:lN[ext]	go to previous entry in location list
 |:lNfile|	:lNf[ile]	go to last entry in previous file
 |:list|		:l[ist]		print lines
@@ -1299,6 +1325,9 @@ The commands are sorted on the non-optional part of their name.
 |:ltag|		:lt[ag]		jump to tag and add matching tags to the
 				location list
 |:lunmap|	:lu[nmap]	like ":unmap!" but includes Lang-Arg mode
+|:lua|		:lua		execute |Lua| command
+|:luado|	:luad[o]	execute Lua command for each line
+|:luafile|	:luaf[ile]	execute |Lua| script file
 |:lvimgrep|	:lv[imgrep]	search for pattern in files
 |:lvimgrepadd|	:lvimgrepa[dd]	like :vimgrep, but append to current list
 |:lwindow|	:lw[indow]	open or close location window
@@ -1321,7 +1350,9 @@ The commands are sorted on the non-optional part of their name.
 |:mode|		:mod[e]		show or change the screen mode
 |:mzscheme|	:mz[scheme]	execute MzScheme command
 |:mzfile|	:mzf[ile]	execute MzScheme script file
+|:nbclose|	:nbc[lose]	close the current Netbeans session
 |:nbkey|	:nb[key]	pass a key to Netbeans
+|:nbstart|	:nbs[art]	start a new Netbeans session
 |:next|		:n[ext]		go to next file in the argument list
 |:new|		:new		create a new empty window
 |:nmap|		:nm[ap]		like ":map" but for Normal mode
@@ -1339,6 +1370,7 @@ The commands are sorted on the non-optional part of their name.
 |:number|	:nu[mber]	print lines with line number
 |:nunmap|	:nun[map]	like ":unmap" but for Normal mode
 |:nunmenu|	:nunme[nu]	remove menu for Normal mode
+|:oldfiles|	:ol[dfiles]	list files that have marks in the viminfo file
 |:open|		:o[pen]		start open mode (not implemented)
 |:omap|		:om[ap]		like ":map" but for Operator-pending mode
 |:omapclear|	:omapc[lear]	remove all mappings for Operator-pending mode
@@ -1349,6 +1381,7 @@ The commands are sorted on the non-optional part of their name.
 |:options|	:opt[ions]	open the options-window
 |:ounmap|	:ou[nmap]	like ":unmap" but for Operator-pending mode
 |:ounmenu|	:ounme[nu]	remove menu for Operator-pending mode
+|:ownsyntax|	:ow[nsyntax]	set new local syntax highlight for this window
 |:pclose|	:pc[lose]	close preview window
 |:pedit|	:ped[it]	edit file in the preview window
 |:perl|		:pe[rl]		execute Perl command
@@ -1359,7 +1392,7 @@ The commands are sorted on the non-optional part of their name.
 |:promptrepl|	:promptr[epl]	open GUI dialog for search/replace
 |:perldo|	:perld[o]	execute Perl command for each line
 |:pop|		:po[p]		jump to older entry in tag stack
-|:popup|	:pop[up]	popup a menu by name
+|:popup|	:popu[p]	popup a menu by name
 |:ppop|		:pp[op]		":pop" in preview window
 |:preserve|	:pre[serve]	write all text to swap file
 |:previous|	:prev[ious]	go to previous file in argument list
@@ -1375,7 +1408,12 @@ The commands are sorted on the non-optional part of their name.
 |:ptselect|	:pts[elect]	|:tselect| and show tag in preview window
 |:put|		:pu[t]		insert contents of register in the text
 |:pwd|		:pw[d]		print current directory
+|:py3|		:py3		execute Python 3 command
+|:python3|	:python3	same as :py3
+|:py3do|	:py3d[o]	execute Python 3 command for each line
+|:py3file|	:py3f[ile]	execute Python 3 script file
 |:python|	:py[thon]	execute Python command
+|:pydo|		:pyd[o]		execute Python command for each line
 |:pyfile|	:pyf[ile]	execute Python script file
 |:quit|		:q[uit]		quit current window (when one window quit Vim)
 |:quitall|	:quita[ll]	quit Vim
@@ -1396,6 +1434,7 @@ The commands are sorted on the non-optional part of their name.
 |:ruby|		:rub[y]		execute Ruby command
 |:rubydo|	:rubyd[o]	execute Ruby command for each line
 |:rubyfile|	:rubyf[ile]	execute Ruby script file
+|:rundo|	:rund[o]	read undo information from a file
 |:runtime|	:ru[ntime]	source vim scripts in 'runtimepath'
 |:rviminfo|	:rv[iminfo]	read from viminfo file
 |:substitute|	:s[ubstitute]	find and replace text
@@ -1436,12 +1475,12 @@ The commands are sorted on the non-optional part of their name.
 |:shell|	:sh[ell]	escape to a shell
 |:simalt|	:sim[alt]	Win32 GUI: simulate Windows ALT key
 |:sign|		:sig[n]		manipulate signs
-|:silent|	:sil[ent]	Run a command silently
+|:silent|	:sil[ent]	run a command silently
 |:sleep|	:sl[eep]	do nothing for a few seconds
 |:slast|	:sla[st]	split window and go to last file in the
 				argument list
 |:smagic|	:sm[agic]	:substitute with 'magic'
-|:smap|		:sma[p]		like ":map" but for Select mode
+|:smap|		:smap		like ":map" but for Select mode
 |:smapclear|	:smapc[lear]	remove all mappings for Select mode
 |:smenu|	:sme[nu]	add menu for Select mode
 |:snext|	:sn[ext]	split window and go to next file in the
@@ -1478,6 +1517,7 @@ The commands are sorted on the non-optional part of their name.
 |:sview|	:sv[iew]	split window and edit file read-only
 |:swapname|	:sw[apname]	show the name of the current swap file
 |:syntax|	:sy[ntax]	syntax highlighting
+|:syntime|	:synti[me]	measure syntax highlighting speed
 |:syncbind|	:sync[bind]	sync scroll binding
 |:t|		:t		same as ":copy"
 |:tNext|	:tN[ext]	jump to previous matching tag
@@ -1525,6 +1565,7 @@ The commands are sorted on the non-optional part of their name.
 |:unlockvar|	:unlo[ckvar]	unlock variables
 |:unmap|	:unm[ap]	remove mapping
 |:unmenu|	:unme[nu]	remove menu
+|:unsilent|	:uns[ilent]	run a command not silently
 |:update|	:up[date]	write buffer if modified
 |:vglobal|	:v[global]	execute commands for not matching lines
 |:version|	:ve[rsion]	print version number and other info
@@ -1560,6 +1601,7 @@ The commands are sorted on the non-optional part of their name.
 |:wq|		:wq		write to a file and quit window or Vim
 |:wqall|	:wqa[ll]	write all changed buffers and quit Vim
 |:wsverb|	:ws[verb]	pass the verb to workshop over IPC
+|:wundo|	:wu[ndo]	write undo information to a file
 |:wviminfo|	:wv[iminfo]	write to viminfo file
 |:xit|		:x[it]		write if buffer changed and quit window or Vim
 |:xall|		:xa[ll]		same as ":wqall"

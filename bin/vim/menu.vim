@@ -2,7 +2,7 @@
 " You can also use this as a start for your own set of menus.
 "
 " Maintainer:	Bram Moolenaar <Bram@vim.org>
-" Last Change:	2008 Jun 30
+" Last Change:	2013 May 17
 
 " Note that ":an" (short for ":anoremenu") is often used to make a menu work
 " in all modes and avoid side effects from mappings defined by the user.
@@ -101,7 +101,7 @@ an 10.320 &File.Sp&lit-Open\.\.\.<Tab>:sp	:browse sp<CR>
 an 10.320 &File.Open\ Tab\.\.\.<Tab>:tabnew	:browse tabnew<CR>
 an 10.325 &File.&New<Tab>:enew			:confirm enew<CR>
 an <silent> 10.330 &File.&Close<Tab>:close
-	\ :if winheight(2) < 0 <Bar>
+	\ :if winheight(2) < 0 && tabpagewinnr(2) == 0 <Bar>
 	\   confirm enew <Bar>
 	\ else <Bar>
 	\   confirm close <Bar>
@@ -132,12 +132,13 @@ an 10.610 &File.Sa&ve-Exit<Tab>:wqa		:confirm wqa<CR>
 an 10.620 &File.E&xit<Tab>:qa			:confirm qa<CR>
 
 func! <SID>SelectAll()
-  exe "norm gg" . (&slm == "" ? "VG" : "gH\<C-O>G")
+  exe "norm! gg" . (&slm == "" ? "VG" : "gH\<C-O>G")
 endfunc
 
 func! s:FnameEscape(fname)
   if exists('*fnameescape')
     return fnameescape(a:fname)
+  endif
   return escape(a:fname, " \t\n*?[{`$\\%#'\"|!<")
 endfunc
 
@@ -275,6 +276,7 @@ endfun
 
 " Boolean options
 an 20.440.100 &Edit.F&ile\ Settings.Toggle\ Line\ &Numbering<Tab>:set\ nu!	:set nu! nu?<CR>
+an 20.440.105 &Edit.F&ile\ Settings.Toggle\ relati&ve\ Line\ Numbering<Tab>:set\ rnu!	:set rnu! rnu?<CR>
 an 20.440.110 &Edit.F&ile\ Settings.Toggle\ &List\ Mode<Tab>:set\ list!	:set list! list?<CR>
 an 20.440.120 &Edit.F&ile\ Settings.Toggle\ Line\ &Wrap<Tab>:set\ wrap!	:set wrap! wrap?<CR>
 an 20.440.130 &Edit.F&ile\ Settings.Toggle\ W&rap\ at\ word<Tab>:set\ lbr!	:set lbr! lbr?<CR>
@@ -306,8 +308,10 @@ fun! s:TextWidth()
   endif
   let n = inputdialog(g:menutrans_textwidth_dialog, &tw)
   if n != ""
-    " remove leading zeros to avoid it being used as an octal number
-    let &tw = substitute(n, "^0*", "", "")
+    " Remove leading zeros to avoid it being used as an octal number.
+    " But keep a zero by itself.
+    let tw = substitute(n, "^0*", "", "")
+    let &tw = tw == '' ? 0 : tw 
   endif
 endfun
 
@@ -335,27 +339,23 @@ fun! s:FileFormat()
   endif
 endfun
 
+
 " Setup the Edit.Color Scheme submenu
+
+" get NL separated string with file names
 let s:n = globpath(&runtimepath, "colors/*.vim")
+
+" split at NL, Ignore case for VMS and windows, sort on name
+let s:names = sort(map(split(s:n, "\n"), 'substitute(v:val, "\\c.*[/\\\\:\\]]\\([^/\\\\:]*\\)\\.vim", "\\1", "")'), 1)
+
+" define all the submenu entries
 let s:idx = 100
-while strlen(s:n) > 0
-  let s:i = stridx(s:n, "\n")
-  if s:i < 0
-    let s:name = s:n
-    let s:n = ""
-  else
-    let s:name = strpart(s:n, 0, s:i)
-    let s:n = strpart(s:n, s:i + 1, 19999)
-  endif
-  " Ignore case for VMS and windows
-  let s:name = substitute(s:name, '\c.*[/\\:\]]\([^/\\:]*\)\.vim', '\1', '')
+for s:name in s:names
   exe "an 20.450." . s:idx . ' &Edit.C&olor\ Scheme.' . s:name . " :colors " . s:name . "<CR>"
-  unlet s:name
-  unlet s:i
   let s:idx = s:idx + 10
-endwhile
-unlet s:n
-unlet s:idx
+endfor
+unlet s:name s:names s:n s:idx
+
 
 " Setup the Edit.Keymap submenu
 if has("keymap")
@@ -436,6 +436,10 @@ if has("spell")
       let enc = &enc
     endif
 
+    if !exists("g:menutrans_set_lang_to")
+      let g:menutrans_set_lang_to = 'Set language to'
+    endif
+
     let found = 0
     let s = globpath(&rtp, "spell/*." . enc . ".spl")
     if s != ""
@@ -443,8 +447,9 @@ if has("spell")
       for f in split(s, "\n")
 	let nm = substitute(f, '.*spell[/\\]\(..\)\.[^/\\]*\.spl', '\1', "")
 	if nm != "en" && nm !~ '/'
+          let _nm = nm
 	  let found += 1
-	  let menuname = '&Tools.&Spelling.Set\ language\ to\ "' . nm . '"'
+	  let menuname = '&Tools.&Spelling.' . escape(g:menutrans_set_lang_to, "\\. \t|") . '\ "' . nm . '"'
 	  exe 'an 40.335.' . n . ' ' . menuname . ' :set spl=' . nm . ' spell<CR>'
 	  let s:undo_spellang += ['aun ' . menuname]
 	endif
@@ -454,7 +459,7 @@ if has("spell")
     if found == 0
       echomsg "Could not find other spell files"
     elseif found == 1
-      echomsg "Found spell file " . nm
+      echomsg "Found spell file " . _nm
     else
       echomsg "Found " . found . " more spell files"
     endif
@@ -899,7 +904,6 @@ if has("spell")
     let [w, a] = spellbadword()
     if col('.') > curcol		" don't use word after the cursor
       let w = ''
-      call cursor(0, curcol)	" put the cursor back where it was
     endif
     if w != ''
       if a == 'caps'
@@ -907,12 +911,13 @@ if has("spell")
       else
 	let s:suglist = spellsuggest(w, 10)
       endif
-      if len(s:suglist) <= 0
-	call cursor(0, curcol)	" put the cursor back where it was
-      else
+      if len(s:suglist) > 0
 	let s:changeitem = 'change\ "' . escape(w, ' .'). '"\ to'
 	let s:fromword = w
 	let pri = 1
+	" set 'cpo' to include the <CR>
+	let cpo_save = &cpo
+	set cpo&vim
 	for sug in s:suglist
 	  exe 'anoremenu 1.5.' . pri . ' PopUp.' . s:changeitem . '.' . escape(sug, ' .')
 		\ . ' :call <SID>SpellReplace(' . pri . ')<CR>'
@@ -926,12 +931,16 @@ if has("spell")
 	exe 'anoremenu 1.7 PopUp.' . s:ignoreitem . ' :spellgood! ' . w . '<CR>'
 
 	anoremenu 1.8 PopUp.-SpellSep- :
+	let &cpo = cpo_save
       endif
     endif
+    call cursor(0, curcol)	" put the cursor back where it was
   endfunc
 
   func! <SID>SpellReplace(n)
     let l = getline('.')
+    " Move the cursor to the start of the word.
+    call spellbadword()
     call setline('.', strpart(l, 0, col('.') - 1) . s:suglist[a:n - 1]
 	  \ . strpart(l, col('.') + len(s:fromword) - 1))
   endfunc
@@ -1016,10 +1025,9 @@ else
   tmenu ToolBar.Copy		Copy to clipboard
   tmenu ToolBar.Paste		Paste from Clipboard
   if !has("gui_athena")
-    tmenu ToolBar.Find		Find...
+    tmenu ToolBar.Replace	Find / Replace...
     tmenu ToolBar.FindNext	Find Next
     tmenu ToolBar.FindPrev	Find Previous
-    tmenu ToolBar.Replace		Find / Replace...
   endif
   tmenu ToolBar.LoadSesn	Choose a session to load
   tmenu ToolBar.SaveSesn	Save current session

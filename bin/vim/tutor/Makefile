@@ -6,9 +6,11 @@
 # Similarly for Russian and Korean
 
 all: tutor.utf-8 \
+	tutor.bar \
 	tutor.ca.utf-8 \
 	tutor.de.utf-8 \
 	tutor.el tutor.el.cp737 \
+	tutor.eo \
 	tutor.es.utf-8 \
 	tutor.fr.utf-8 \
 	tutor.hr tutor.hr.cp1250 \
@@ -16,7 +18,10 @@ all: tutor.utf-8 \
 	tutor.it.utf-8 \
 	tutor.ja.sjis tutor.ja.euc \
 	tutor.ko.euc \
+	tutor.nl \
 	tutor.no.utf-8 \
+	tutor.nb \
+	tutor.nb.utf-8 \
 	tutor.ru tutor.ru.cp1251 \
 	tutor.sv.utf-8 \
 	tutor.zh.utf-8
@@ -24,8 +29,14 @@ all: tutor.utf-8 \
 tutor.utf-8: tutor
 	iconv -f ISO-8859-1 -t UTF-8 tutor > tutor.utf-8
 
+tutor.bar: tutor.bar.utf-8
+	iconv -f UTF-8 -t ISO-8859-1 tutor.bar.utf-8 > tutor.bar
+
 tutor.ca.utf-8: tutor.ca
 	iconv -f ISO-8859-1 -t UTF-8 tutor.ca > tutor.ca.utf-8
+
+tutor.eo: tutor.eo.utf-8
+	iconv -f UTF-8 -t ISO-8859-3 tutor.eo.utf-8 > tutor.eo
 
 tutor.de.utf-8: tutor.de
 	iconv -f ISO-8859-1 -t UTF-8 tutor.de > tutor.de.utf-8
@@ -63,8 +74,18 @@ tutor.ja.euc: tutor.ja.utf-8
 tutor.ko.euc: tutor.ko.utf-8
 	iconv -f UTF-8 -t EUC-KR tutor.ko.utf-8 > tutor.ko.euc
 
+tutor.nl: tutor.nl.utf-8
+	iconv -f UTF-8 -t ISO-8859-1 tutor.nl.utf-8 > tutor.nl
+
 tutor.no.utf-8: tutor.no
 	iconv -f ISO-8859-1 -t UTF-8 tutor.no > tutor.no.utf-8
+
+# nb is an alias for no
+tutor.nb: tutor.no
+	cp tutor.no tutor.nb
+
+tutor.nb.utf-8: tutor.no.utf-8
+	cp tutor.no.utf-8 tutor.nb.utf-8
 
 tutor.ru: tutor.ru.utf-8
 	iconv -f UTF-8 -t KOI8-R tutor.ru.utf-8 > tutor.ru

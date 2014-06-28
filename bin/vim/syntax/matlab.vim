@@ -1,8 +1,12 @@
 " Vim syntax file
 " Language:	Matlab
-" Maintainer:	Preben 'Peppe' Guldberg <peppe-vim@wielders.org>
+" Maintainer:	Maurizio Tranchero - maurizio(.)tranchero(@)gmail(.)com
+" Credits:	Preben 'Peppe' Guldberg <peppe-vim@wielders.org>
 "		Original author: Mario Eusebio
-" Last Change:	30 May 2003
+" Last Change:	Wed Jan 13 11:12:34 CET 2010
+" 		sinh added to matlab implicit commands
+" Change History:
+" 		- 'global' and 'persistent' keyword are now recognized
 
 " For version 5.x: Clear all syntax items
 " For version 6.x: Quit when a syntax file was already loaded
@@ -16,8 +20,12 @@ syn keyword matlabStatement		return
 syn keyword matlabLabel			case switch
 syn keyword matlabConditional		else elseif end if otherwise
 syn keyword matlabRepeat		do for while
+" MT_ADDON - added exception-specific keywords
+syn keyword matlabExceptions		try catch
+syn keyword matlabOO			classdef properties events methods
 
 syn keyword matlabTodo			contained  TODO
+syn keyword matlabScope			global persistent
 
 " If you do not want these operators lit, uncommment them and the "hi link" below
 syn match matlabArithmeticOperator	"[-+]"
@@ -31,7 +39,8 @@ syn match matlabLineContinuation	"\.\{3}"
 "syn match matlabIdentifier		"\<\a\w*\>"
 
 " String
-syn region matlabString			start=+'+ end=+'+	oneline
+" MT_ADDON - added 'skip' in order to deal with 'tic' escaping sequence 
+syn region matlabString			start=+'+ end=+'+	oneline skip=+''+
 
 " If you don't like tabs
 syn match matlabTab			"\t"
@@ -51,6 +60,9 @@ syn match matlabTransposeOperator	"[])a-zA-Z0-9.]'"lc=1
 syn match matlabSemicolon		";"
 
 syn match matlabComment			"%.*$"	contains=matlabTodo,matlabTab
+" MT_ADDON - correctly highlights words after '...' as comments
+syn match matlabComment			"\.\.\..*$"	contains=matlabTodo,matlabTab
+syn region matlabMultilineComment	start=+%{+ end=+%}+ contains=matlabTodo,matlabTab
 
 syn keyword matlabOperator		break zeros default margin round ones rand
 syn keyword matlabOperator		ceil floor size clear zeros eye mean std cov
@@ -58,7 +70,7 @@ syn keyword matlabOperator		ceil floor size clear zeros eye mean std cov
 syn keyword matlabFunction		error eval function
 
 syn keyword matlabImplicit		abs acos atan asin cos cosh exp log prod sum
-syn keyword matlabImplicit		log10 max min sign sin sqrt tan reshape
+syn keyword matlabImplicit		log10 max min sign sin sinh sqrt tan reshape
 
 syn match matlabError	"-\=\<\d\+\.\d\+\.[^*/\\^]"
 syn match matlabError	"-\=\<\d\+\.\d\+[eEdD][-+]\=\d\+\.\([^*/\\^]\)"
@@ -75,10 +87,11 @@ if version >= 508 || !exists("did_matlab_syntax_inits")
   endif
 
   HiLink matlabTransposeOperator	matlabOperator
-  HiLink matlabOperator		Operator
-  HiLink matlabLineContinuation	Special
+  HiLink matlabOperator			Operator
+  HiLink matlabLineContinuation		Special
   HiLink matlabLabel			Label
   HiLink matlabConditional		Conditional
+  HiLink matlabExceptions		Conditional
   HiLink matlabRepeat			Repeat
   HiLink matlabTodo			Todo
   HiLink matlabString			String
@@ -86,12 +99,15 @@ if version >= 508 || !exists("did_matlab_syntax_inits")
   HiLink matlabTransposeOther		Identifier
   HiLink matlabNumber			Number
   HiLink matlabFloat			Float
-  HiLink matlabFunction		Function
+  HiLink matlabFunction			Function
   HiLink matlabError			Error
-  HiLink matlabImplicit		matlabStatement
+  HiLink matlabImplicit			matlabStatement
   HiLink matlabStatement		Statement
+  HiLink matlabOO			Statement
   HiLink matlabSemicolon		SpecialChar
   HiLink matlabComment			Comment
+  HiLink matlabMultilineComment		Comment
+  HiLink matlabScope			Type
 
   HiLink matlabArithmeticOperator	matlabOperator
   HiLink matlabRelationalOperator	matlabOperator

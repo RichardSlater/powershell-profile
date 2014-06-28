@@ -1,8 +1,8 @@
 " Vim filetype plugin file
 " Language:	aspvbs
-" Maintainer:	Dan Sharp <dwsharp at hotmail dot com>
-" Last Changed: 2004 Jun 28
-" URL:		http://mywebpage.netscape.com/sharppeople/vim/ftplugin
+" Maintainer:	Dan Sharp <dwsharp at users dot sourceforge dot net>
+" Last Changed: 20 Jan 2009
+" URL:		http://dwsharp.users.sourceforge.net/vim/ftplugin
 
 if exists("b:did_ftplugin") | finish | endif
 
@@ -57,3 +57,4 @@ let b:undo_ftplugin = "unlet! b:match_words b:match_ignorecase b:browsefilter | 
 
 " Restore the saved compatibility options.
 let &cpo = s:save_cpo
+unlet s:save_cpo

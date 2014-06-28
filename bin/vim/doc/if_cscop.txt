@@ -1,4 +1,4 @@
-*if_cscop.txt*  For Vim version 7.2.  Last change: 2005 Mar 29
+*if_cscop.txt*  For Vim version 7.4.  Last change: 2011 Jun 12
 
 
 		  VIM REFERENCE MANUAL    by Andy Kahn
@@ -112,8 +112,7 @@ The available subcommands are:
 	    :cscope add /projects/vim/cscope.out /usr/local/vim
 	    :cscope add cscope.out /usr/local/vim -C
 <
-				      *cscope-find* *cs-find*
-						*E565* *E567*
+				      *cscope-find* *cs-find* *E567*
     find  : Query cscope.  All cscope query options are available
 	    except option #5 ("Change this grep pattern").
 
@@ -131,11 +130,22 @@ The available subcommands are:
 		7 or f: Find this file
 		8 or i: Find files #including this file
 
+	For all types, except 4 and 6, leading white space for {name} is
+	removed.  For 4 and 6 there is exactly one space between {querytype}
+	and {name}.  Further white space is included in {name}.
+
 	EXAMPLES >
 	    :cscope find c vim_free
-	    :cscope find 3 vim_free
+	    :cscope find 3  vim_free
 <
-	    These two examples perform the same query. >
+	    These two examples perform the same query: functions calling
+	    "vim_free". >
+
+	    :cscope find t initOnce
+	    :cscope find t  initOnce
+<
+	    The first one searches for the text "initOnce", the second one for
+	    " initOnce". >
 
 	    :cscope find 0 DEFAULT_TERM
 <
@@ -187,7 +197,7 @@ The available subcommands are:
 
 	    USAGE   :cs help
 
-						*E260* *E261*
+							*E261*
     kill  : Kill a cscope connection (or kill all cscope connections).
 
 	    USAGE   :cs kill {num|partial_name}
@@ -254,12 +264,22 @@ seems to be useful: >
 	:set cscopequickfix=s-,c-,d-,i-,t-,e-
 <
 							*cscopetag* *cst*
-If 'cscopetag' set, the commands ":tag" and CTRL-] as well as "vim -t" will
-always use |:cstag| instead of the default :tag behavior.  Effectively, by
-setting 'cst', you will always search your cscope databases as well as your
-tag files.  The default is off.  Examples: >
+If 'cscopetag' is set, the commands ":tag" and CTRL-] as well as "vim -t"
+will always use |:cstag| instead of the default :tag behavior.  Effectively,
+by setting 'cst', you will always search your cscope databases as well as
+your tag files.  The default is off.  Examples: >
 	:set cst
 	:set nocst
+<
+							*cscoperelative* *csre*
+If 'cscoperelative' is set, then in absence of a prefix given to cscope
+(prefix is the argument of -P option of cscope), basename of cscope.out
+location (usually the project root directory) will be used as the prefix
+to construct an absolute path.  The default is off.  Note: This option is
+only effective when cscope (cscopeprg) is initialized without a prefix
+path (-P).  Examples: >
+	:set csre
+	:set nocsre
 <
 							*cscopetagorder* *csto*
 The value of 'csto' determines the order in which |:cstag| performs a search.
@@ -344,13 +364,8 @@ cscope version for Win32 see:
 The DJGPP-built version from http://cscope.sourceforge.net is known to not
 work with Vim.
 
-There are a couple of hard-coded limitations:
-
-    1. The maximum number of cscope connections allowed is 8.  Do you
-    really need more?
-
-    2. Doing a |:tjump| when |:cstag| searches the tag files is not
-    configurable (e.g., you can't do a tselect instead).
+Hard-coded limitation: doing a |:tjump| when |:cstag| searches the tag files
+is not configurable (e.g., you can't do a tselect instead).
 
 ==============================================================================
 6. Suggested usage					*cscope-suggestions*
@@ -475,7 +490,8 @@ bit of code) was adapted from the cscope interface in nvi.  Please report
 any problems, suggestions, patches, et al., you have for the usage of
 cscope within Vim to him.
 							*cscope-win32*
-For a cscope version for Win32 see: http://iamphet.nm.ru/cscope/index.html
+For a cscope version for Win32 see:
+	http://code.google.com/p/cscope-win32/
 
 Win32 support was added by Sergey Khorev <sergey.khorev@gmail.com>.  Contact
 him if you have Win32-specific issues.

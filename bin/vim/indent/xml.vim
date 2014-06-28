@@ -1,22 +1,23 @@
 " Language:	xml
 " Maintainer:	Johannes Zellner <johannes@zellner.org>
-" Last Change:	Tue, 27 Apr 2004 14:54:59 CEST
+" Last Change:	2012 Jul 25
 " Notes:	1) does not indent pure non-xml code (e.g. embedded scripts)
 "		2) will be confused by unbalanced tags in comments
 "		or CDATA sections.
-" TODO:		implement pre-like tags, see xml_indent_open / xml_indent_close
+"		2009-05-26 patch by Nikolai Weibull
+" TODO: 	implement pre-like tags, see xml_indent_open / xml_indent_close
 
 " Only load this indent file when no other was loaded.
 if exists("b:did_indent")
     finish
 endif
 let b:did_indent = 1
+let s:keepcpo= &cpo
+set cpo&vim
 
 " [-- local settings (must come before aborting the script) --]
 setlocal indentexpr=XmlIndentGet(v:lnum,1)
 setlocal indentkeys=o,O,*<Return>,<>>,<<>,/,{,}
-
-set cpo-=C
 
 if !exists('b:xml_indent_open')
     let b:xml_indent_open = '.\{-}<\a'
@@ -30,8 +31,16 @@ if !exists('b:xml_indent_close')
     " let b:xml_indent_close = '.\{-}</\(address\)\@!'
 endif
 
+let &cpo = s:keepcpo
+unlet s:keepcpo
+
 " [-- finish, if the function already exists --]
-if exists('*XmlIndentGet') | finish | endif
+if exists('*XmlIndentGet')
+  finish
+endif
+
+let s:keepcpo= &cpo
+set cpo&vim
 
 fun! <SID>XmlIndentWithPattern(line, pat)
     let s = substitute('x'.a:line, a:pat, "\1", 'g')
@@ -46,6 +55,9 @@ fun! <SID>XmlIndentSynCheck(lnum)
 	if '' != syn1 && syn1 !~ 'xml' && '' != syn2 && syn2 !~ 'xml'
 	    " don't indent pure non-xml code
 	    return 0
+	elseif syn1 =~ '^xmlComment' && syn2 =~ '^xmlComment'
+	    " indent comments specially
+	    return -1
 	endif
     endif
     return 1
@@ -74,8 +86,12 @@ fun! XmlIndentGet(lnum, use_syntax_check)
     endif
 
     if a:use_syntax_check
-	if 0 == <SID>XmlIndentSynCheck(lnum) || 0 == <SID>XmlIndentSynCheck(a:lnum)
+	let check_lnum = <SID>XmlIndentSynCheck(lnum)
+	let check_alnum = <SID>XmlIndentSynCheck(a:lnum)
+	if 0 == check_lnum || 0 == check_alnum
 	    return indent(a:lnum)
+	elseif -1 == check_lnum || -1 == check_alnum
+	    return -1
 	endif
     endif
 
@@ -84,5 +100,8 @@ fun! XmlIndentGet(lnum, use_syntax_check)
 
     return ind
 endfun
+
+let &cpo = s:keepcpo
+unlet s:keepcpo
 
 " vim:ts=8

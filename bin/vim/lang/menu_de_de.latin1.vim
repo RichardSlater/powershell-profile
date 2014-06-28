@@ -10,6 +10,8 @@ if exists("did_menu_trans")
   finish
 endif
 let did_menu_trans = 1
+let s:keepcpo= &cpo
+set cpo&vim
 
 " The translations below are in latin1, but they work for cp1252 and
 " iso-8859-15 without conversion as well.
@@ -84,13 +86,14 @@ menutrans Toggle\ &Right\ Scrollbar			Rechten\ Rollbalken\ ein-\ und\ ausschalte
 menutrans F&ile\ Settings				&Datei-Einstellungen
 
 " Boolean options
-menutrans Toggle\ Line\ &Numbering<Tab>:set\ nu!	Anzeige\ der\ Zeilen&nummer\ ein-\ und\ ausschalten<Tab>:set\ nu!
-menutrans Toggle\ &List\ Mode<Tab>:set\ list!		&List-Modus\ ein-\ und\ ausschalten<Tab>:set\ list!
-menutrans Toggle\ Line\ &Wrap<Tab>:set\ wrap!		&Zeilenumbruch\ ein-\ und\ ausschalten<Tab>:set\ wrap!
-menutrans Toggle\ W&rap\ at\ word<Tab>:set\ lbr!	Umbruch\ an\ &Wortgrenzen\ ein-\ und\ ausschalten<Tab>:set\ lbr!
-menutrans Toggle\ &expand-tab<Tab>:set\ et!		&Erweiterung\ von\ Tabulatoren\ ein-\ und\ ausschalten<Tab>:set\ et!
-menutrans Toggle\ &auto-indent<Tab>:set\ ai!		&Automatische\ Einrückung\ ein-\ und\ ausschalten<Tab>:set\ ai!
-menutrans Toggle\ &C-indenting<Tab>:set\ cin!		&C-Einrückung\ ein-\ und\ ausschalten<Tab>:set\ cin!
+menutrans Toggle\ Line\ &Numbering<Tab>:set\ nu!		Anzeige\ der\ Zeilen&nummer\ ein-\ und\ ausschalten<Tab>:set\ nu!
+menutrans Toggle\ relati&ve\ Line\ Numbering<Tab>:set\ rnu!	Anzeige\ der\ relati&ven\ Zeilennummer\ ein-\ und\ ausschalten<Tab>:set\ rnu!
+menutrans Toggle\ &List\ Mode<Tab>:set\ list!			&List-Modus\ ein-\ und\ ausschalten<Tab>:set\ list!
+menutrans Toggle\ Line\ &Wrap<Tab>:set\ wrap!			&Zeilenumbruch\ ein-\ und\ ausschalten<Tab>:set\ wrap!
+menutrans Toggle\ W&rap\ at\ word<Tab>:set\ lbr!		Umbruch\ an\ &Wortgrenzen\ ein-\ und\ ausschalten<Tab>:set\ lbr!
+menutrans Toggle\ &expand-tab<Tab>:set\ et!			&Erweiterung\ von\ Tabulatoren\ ein-\ und\ ausschalten<Tab>:set\ et!
+menutrans Toggle\ &auto-indent<Tab>:set\ ai!			&Automatische\ Einrückung\ ein-\ und\ ausschalten<Tab>:set\ ai!
+menutrans Toggle\ &C-indenting<Tab>:set\ cin!			&C-Einrückung\ ein-\ und\ ausschalten<Tab>:set\ cin!
 
 " other options
 menutrans &Shiftwidth					&Schiebeweite
@@ -301,3 +304,6 @@ let g:menutrans_tags_dialog = "Geben Sie die Namen der 'tag'-Dateien ein.\nTrenn
 let g:menutrans_textwidth_dialog = "Geben Sie eine neue Text-Breite ein (oder 0, um die Formatierung abzuschalten)"
 let g:menutrans_fileformat_dialog = "Wählen Sie ein Datei-Format aus"
 " }}}
+
+let &cpo = s:keepcpo
+unlet s:keepcpo

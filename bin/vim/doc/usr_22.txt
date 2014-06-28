@@ -1,4 +1,4 @@
-*usr_22.txt*	For Vim version 7.2.  Last change: 2007 Aug 14
+*usr_22.txt*	For Vim version 7.4.  Last change: 2012 Nov 15
 
 		     VIM USER MANUAL - by Bram Moolenaar
 
@@ -54,7 +54,7 @@ You can see these items:
     *.c files, etc)
 5.  How to get help (use the <F1> key), and an abbreviated listing
     of available commands
-6.  A listing of files, including "../", which allows one to to list
+6.  A listing of files, including "../", which allows one to list
     the parent directory.
 
 If you have syntax highlighting enabled, the different parts are highlighted
@@ -98,7 +98,7 @@ browser.  This is what you get: >
 <    	(etc)
 
 The <F1> key thus brings you to a netrw directory browsing contents help page.
-Its a regular help page; use the usual |CTRL-]| to jump to tagged help items
+It's a regular help page; use the usual |CTRL-]| to jump to tagged help items
 and |CTRL-O| to jump back.
 
 To select files for display and editing: (with the cursor is atop a filename)
@@ -326,9 +326,9 @@ shorter to type: >
 
 The output could look like this:
 
-  1 #h	"help.txt"			line 62 ~
-  2 %a+	"usr_21.txt"			line 1 ~
-  3	"usr_toc.txt"			line 1 ~
+  1 #h   "help.txt"			line 62 ~
+  2 %a + "usr_21.txt"			line 1 ~
+  3      "usr_toc.txt"			line 1 ~
 
 The first column contains the buffer number.  You can use this to edit the
 buffer without having to type the name, see below.
@@ -358,7 +358,7 @@ use the name, or part of it, instead: >
 
 	:buffer help
 
-Vim will find a best match for the name you type.  If there is only one
+Vim will find the best match for the name you type.  If there is only one
 buffer that matches the name, it will be used.  In this case "help.txt".
    To open a buffer in a new window: >
 

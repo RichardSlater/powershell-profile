@@ -1,4 +1,4 @@
-*debug.txt*     For Vim version 7.2.  Last change: 2006 May 01
+*debug.txt*     For Vim version 7.4.  Last change: 2012 Feb 11
 
 
 		  VIM REFERENCE MANUAL    by Bram Moolenaar
@@ -10,18 +10,20 @@ This is for debugging Vim itself, when it doesn't work properly.
 For debugging Vim scripts, functions, etc. see |debug-scripts|
 
 1. Location of a crash, using gcc and gdb	|debug-gcc|
-2. Windows Bug Reporting			|debug-win32|
+2. Locating memory leaks			|debug-leaks|
+3. Windows Bug Reporting			|debug-win32|
 
 ==============================================================================
 
-1. Location of a crash, using gcc and gdb		*debug-gcc*
+1. Location of a crash, using gcc and gdb		*debug-gcc* *gdb*
 
 When Vim crashes in one of the test files, and you are using gcc for
 compilation, here is what you can do to find out exactly where Vim crashes.
 This also applies when using the MingW tools.
 
-1. Compile Vim with the "-g" option (there is a line in the Makefile for this,
-   which you can uncomment).
+1. Compile Vim with the "-g" option (there is a line in the src/Makefile for
+   this, which you can uncomment).  Also make sure "strip" is disabled (do not
+   install it, or use the line "STRIP = /bin/true").
 
 2. Execute these commands (replace "11" with the test that fails): >
 	cd testdir
@@ -38,13 +40,35 @@ This also applies when using the MingW tools.
 
 ==============================================================================
 
-2. Windows Bug Reporting				*debug-win32*
+2. Locating memory leaks			*debug-leaks* *valgrind*
+
+If you suspect Vim is leaking memory and you are using Linux, the valgrind
+tool is very useful to pinpoint memory leaks.
+
+First of all, build Vim with EXITFREE defined.  Search for this in MAKEFILE
+and uncomment the line.
+
+Use this command to start Vim:
+>
+	valgrind --log-file=valgrind.log --leak-check=full ./vim
+
+Note: Vim will run much slower.  If your .vimrc is big or you have several
+plugins you need to be patient for startup, or run with the "-u NONE"
+argument.
+
+There are often a few leaks from libraries, such as getpwuid() and
+XtVaAppCreateShell().  Those are unavoidable.  The number of bytes should be
+very small a Kbyte or less.
+
+==============================================================================
+
+3. Windows Bug Reporting				*debug-win32*
 
 If the Windows version of Vim crashes in a reproducible manner, you can take
 some steps to provide a useful bug report.
 
 
-GENERIC ~
+3.1 GENERIC ~
 
 You must obtain the debugger symbols (PDB) file for your executable: gvim.pdb
 for gvim.exe, or vim.pdb for vim.exe. The PDB should be available from the
@@ -66,7 +90,7 @@ a Vim executable compiled with the Borland compiler; gdb (see above
 
 
 								*debug-vs2005*
-2.2 Debugging Vim crashes with Visual Studio 2005/Visual C++ 2005 Express ~
+3.2 Debugging Vim crashes with Visual Studio 2005/Visual C++ 2005 Express ~
 
 First launch vim.exe or gvim.exe and then launch Visual Studio.  (If you don't
 have Visual Studio, follow the instructions at |get-ms-debuggers| to obtain a
@@ -100,7 +124,7 @@ installed as a just-in-time debugger. Use WinDbg, |debug-windbg|, if you
 need to save minidumps or you want a just-in-time (postmortem) debugger.
 
 								*debug-windbg*
-2.3 Debugging Vim crashes with WinDbg ~
+3.3 Debugging Vim crashes with WinDbg ~
 
 See |get-ms-debuggers| to obtain a copy of WinDbg.
 
@@ -126,7 +150,7 @@ To save a minidump, type the following at the WinDbg command line: >
         .dump vim.dmp
 <
 							*debug-minidump*
-2.4 Opening a Minidump ~
+3.4 Opening a Minidump ~
 
 If you have a minidump file, you can open it in Visual Studio or in WinDbg.
 
@@ -138,7 +162,7 @@ In WinDbg: choose Open Crash Dump on the File menu. Follow the instructions in
 |debug-windbg| to set the Symbol File Path.
 
 							*get-ms-debuggers*
-2.5 Obtaining Microsoft Debugging Tools ~
+3.5 Obtaining Microsoft Debugging Tools ~
 
 The Debugging Tools for Windows (including WinDbg) can be downloaded from
     http://www.microsoft.com/whdc/devtools/debugging/default.mspx

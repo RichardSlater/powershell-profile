@@ -1,9 +1,9 @@
 " vimball.vim : construct a file containing both paths and files
 " Author:	Charles E. Campbell, Jr.
-" Date:		Jul 30, 2008
-" Version:	29
+" Date:		Jan 17, 2012
+" Version:	35
 " GetLatestVimScripts: 1502 1 :AutoInstall: vimball.vim
-" Copyright: (c) 2004-2008 by Charles E. Campbell, Jr.
+" Copyright: (c) 2004-2011 by Charles E. Campbell, Jr.
 "            The VIM LICENSE applies to Vimball.vim, and Vimball.txt
 "            (see |copyright|) except use "Vimball" instead of "Vim".
 "            No warranty, express or implied.
@@ -11,11 +11,17 @@
 
 " ---------------------------------------------------------------------
 "  Load Once: {{{1
-if &cp || exists("g:loaded_vimball") || v:version < 700
+if &cp || exists("g:loaded_vimball")
  finish
 endif
-let s:keepcpo        = &cpo
-let g:loaded_vimball = "v29"
+let g:loaded_vimball = "v35"
+if v:version < 702
+ echohl WarningMsg
+ echo "***warning*** this version of vimball needs vim 7.2"
+ echohl Normal
+ finish
+endif
+let s:keepcpo= &cpo
 set cpo&vim
 "DechoTabOn
 
@@ -52,30 +58,6 @@ if !exists("s:USAGE")
    call vimball#ShowMesg(s:WARNING,"(vimball) g:vimball_mkdir undefined")
   endif
  endif
-
- " set up shell quoting character
- if exists("g:vimball_shq") && !exists("g:netrw_shq")
-  let g:netrw_shq= g:vimball_shq
- endif
- if !exists("g:netrw_shq")
-  if exists("&shq") && &shq != ""
-   let g:netrw_shq= &shq
-  elseif has("win32") || has("win95") || has("win64") || has("win16")
-   if g:netrw_cygwin
-    let g:netrw_shq= "'"
-   else
-    let g:netrw_shq= '"'
-   endif
-  else
-   let g:netrw_shq= "'"
-  endif
-" call Decho("g:netrw_shq<".g:netrw_shq.">")
- endif
-
- " set up escape string (used to protect paths)
- if !exists("g:vimball_path_escape")
-  let g:vimball_path_escape= ' ;#%'
- endif
 endif
 
 " =====================================================================
@@ -85,10 +67,10 @@ endif
 " vimball#MkVimball: creates a vimball given a list of paths to files {{{2
 " Input:
 "     line1,line2: a range of lines containing paths to files to be included in the vimball
-"     writelevel : if true, force a write to filename.vba, even if it exists
+"     writelevel : if true, force a write to filename.vmb, even if it exists
 "                  (usually accomplished with :MkVimball! ...
-"     filename   : base name of file to be created (ie. filename.vba)
-" Output: a filename.vba using vimball format:
+"     filename   : base name of file to be created (ie. filename.vmb)
+" Output: a filename.vmb using vimball format:
 "     path
 "     filesize
 "     [file]
@@ -98,16 +80,16 @@ endif
 fun! vimball#MkVimball(line1,line2,writelevel,...) range
 "  call Dfunc("MkVimball(line1=".a:line1." line2=".a:line2." writelevel=".a:writelevel." vimballname<".a:1.">) a:0=".a:0)
   if a:1 =~ '\.vim$' || a:1 =~ '\.txt$'
-   let vbname= substitute(a:1,'\.\a\{3}$','.vba','')
+   let vbname= substitute(a:1,'\.\a\{3}$','.vmb','')
   else
    let vbname= a:1
   endif
-  if vbname !~ '\.vba$'
-   let vbname= vbname.'.vba'
+  if vbname !~ '\.vmb$'
+   let vbname= vbname.'.vmb'
   endif
 "  call Decho("vbname<".vbname.">")
-  if a:1 =~ '[\/]'
-   call vimball#ShowMesg(s:ERROR,"(MkVimball) vimball name<".a:1."> should not include slashes")
+  if !a:writelevel && a:1 =~ '[\/]'
+   call vimball#ShowMesg(s:ERROR,"(MkVimball) vimball name<".a:1."> should not include slashes; use ! to insist")
 "   call Dret("MkVimball : vimball name<".a:1."> should not include slashes")
    return
   endif
@@ -125,7 +107,7 @@ fun! vimball#MkVimball(line1,line2,writelevel,...) range
    let home= expand(a:2)
   else
    " use first existing directory from rtp
-   let home= s:VimballHome()
+   let home= vimball#VimballHome()
   endif
 
   " save current directory
@@ -152,7 +134,7 @@ fun! vimball#MkVimball(line1,line2,writelevel,...) range
    " create/switch to mkvimball tab
    if !exists("vbtabnr")
     tabnew
-    silent! file Vimball
+    sil! file Vimball
     let vbtabnr= tabpagenr()
    else
     exe "tabn ".vbtabnr
@@ -213,12 +195,12 @@ fun! vimball#Vimball(really,...)
 "  call Dfunc("vimball#Vimball(really=".a:really.") a:0=".a:0)
 
   if v:version < 701 || (v:version == 701 && !exists('*fnameescape'))
-   echoerr "your vim is missing the fnameescape() function"
-"   call Dret("vimball#Vimball : needs 7.1 with patch 299")
+   echoerr "your vim is missing the fnameescape() function (pls upgrade to vim 7.2 or later)"
+"   call Dret("vimball#Vimball : needs 7.1 with patch 299 or later")
    return
   endif
 
-  if getline(1) !~ '^" Vimball Archiver by Charles E. Campbell, Jr., Ph.D.$'
+  if getline(1) !~ '^" Vimball Archiver'
    echoerr "(Vimball) The current file does not appear to be a Vimball!"
 "   call Dret("vimball#Vimball")
    return
@@ -232,15 +214,24 @@ fun! vimball#Vimball(really,...)
   " set up vimball tab
 "  call Decho("setting up vimball tab")
   tabnew
-  silent! file Vimball
+  sil! file Vimball
   let vbtabnr= tabpagenr()
   let didhelp= ""
 
   " go to vim plugin home
   if a:0 > 0
+   " let user specify the directory where the vimball is to be unpacked.
+   " If, however, the user did not specify a full path, set the home to be below the current directory
    let home= expand(a:1)
+   if has("win32") || has("win95") || has("win64") || has("win16")
+	if home !~ '^\a:[/\\]'
+	 let home= getcwd().'/'.a:1
+	endif
+   elseif home !~ '^/'
+	let home= getcwd().'/'.a:1
+   endif
   else
-   let home= s:VimballHome()
+   let home= vimball#VimballHome()
   endif
 "  call Decho("home<".home.">")
 
@@ -272,9 +263,10 @@ fun! vimball#Vimball(really,...)
   while 1 < linenr && linenr < line("$")
    let fname   = substitute(getline(linenr),'\t\[\[\[1$','','')
    let fname   = substitute(fname,'\\','/','g')
-   let fsize   = getline(linenr+1)+0
+   let fsize   = substitute(getline(linenr+1),'^\(\d\+\).\{-}$','\1','')+0
+   let fenc    = substitute(getline(linenr+1),'^\d\+\s*\(\S\{-}\)$','\1','')
    let filecnt = filecnt + 1
-"   call Decho("fname<".fname."> fsize=".fsize." filecnt=".filecnt)
+"   call Decho("fname<".fname."> fsize=".fsize." filecnt=".filecnt. " fenc=".fenc)
 
    if a:really
     echomsg "extracted <".fname.">: ".fsize." lines"
@@ -299,15 +291,18 @@ fun! vimball#Vimball(really,...)
 "    call Decho("making directories if they don't exist yet (fname<".fname.">)")
     let fnamebuf= substitute(fname,'\\','/','g')
 	let dirpath = substitute(home,'\\','/','g')
+"	call Decho("init: fnamebuf<".fnamebuf.">")
+"	call Decho("init: dirpath <".dirpath.">")
     while fnamebuf =~ '/'
      let dirname  = dirpath."/".substitute(fnamebuf,'/.*$','','')
 	 let dirpath  = dirname
      let fnamebuf = substitute(fnamebuf,'^.\{-}/\(.*\)$','\1','')
 "	 call Decho("dirname<".dirname.">")
+"	 call Decho("dirpath<".dirpath.">")
      if !isdirectory(dirname)
 "      call Decho("making <".dirname.">")
       if exists("g:vimball_mkdir")
-	   call system(g:vimball_mkdir." ".s:Escape(dirname))
+	   call system(g:vimball_mkdir." ".shellescape(dirname))
       else
        call mkdir(dirname)
       endif
@@ -322,35 +317,42 @@ fun! vimball#Vimball(really,...)
    let linenr   = linenr + 2
    let lastline = linenr + fsize - 1
 "   call Decho("exe ".linenr.",".lastline."yank a")
-   exe "silent ".linenr.",".lastline."yank a"
+   " no point in handling a zero-length file
+   if lastline >= linenr
+    exe "silent ".linenr.",".lastline."yank a"
 
-   " copy "a" buffer into tab
+    " copy "a" buffer into tab
 "   call Decho('copy "a buffer into tab#'.vbtabnr)
-   exe "tabn ".vbtabnr
-   setlocal ma
-   silent! %d
-   silent put a
-   1
-   silent d
+    exe "tabn ".vbtabnr
+    setlocal ma
+    sil! %d
+    silent put a
+    1
+    sil! d
 
-   " write tab to file
-   if a:really
-    let fnamepath= home."/".fname
+    " write tab to file
+    if a:really
+     let fnamepath= home."/".fname
 "    call Decho("exe w! ".fnameescape(fnamepath))
-	exe "silent w! ".fnameescape(fnamepath)
-    echo "wrote ".fnamepath
-	call s:RecordInVar(home,"call delete('".fnameescape(fnamepath)."')")
-   endif
+	if fenc != ""
+	 exe "silent w! ++enc=".fnameescape(fenc)." ".fnameescape(fnamepath)
+	else
+	 exe "silent w! ".fnameescape(fnamepath)
+	endif
+	echo "wrote ".fnameescape(fnamepath)
+	call s:RecordInVar(home,"call delete('".fnamepath."')")
+    endif
 
-   " return to tab with vimball
+    " return to tab with vimball
 "   call Decho("exe tabn ".curtabnr)
-   exe "tabn ".curtabnr
+    exe "tabn ".curtabnr
 
-   " set up help if its a doc/*.txt file
+    " set up help if its a doc/*.txt file
 "   call Decho("didhelp<".didhelp."> fname<".fname.">")
-   if a:really && didhelp == "" && fname =~ 'doc/[^/]\+\.\(txt\|..x\)$'
-   	let didhelp= substitute(fname,'^\(.*\<doc\)[/\\][^.]*\.\(txt\|..x\)$','\1','')
+    if a:really && didhelp == "" && fname =~ 'doc/[^/]\+\.\(txt\|..x\)$'
+    	let didhelp= substitute(fname,'^\(.*\<doc\)[/\\][^.]*\.\(txt\|..x\)$','\1','')
 "	call Decho("didhelp<".didhelp.">")
+    endif
    endif
 
    " update for next file
@@ -412,13 +414,15 @@ fun! vimball#RmVimball(...)
    let curfile= a:1
 "   call Decho("case a:0=".a:0.": curfile<".curfile.">")
   endif
-  if curfile =~ '\.vba$'
+  if curfile =~ '\.vmb$'
+   let curfile= substitute(curfile,'\.vmb','','')
+  elseif curfile =~ '\.vba$'
    let curfile= substitute(curfile,'\.vba','','')
   endif
   if a:0 >= 2
    let home= expand(a:2)
   else
-   let home= s:VimballHome()
+   let home= vimball#VimballHome()
   endif
   let curdir = getcwd()
 "  call Decho("home   <".home.">")
@@ -430,39 +434,48 @@ fun! vimball#RmVimball(...)
 "   call Decho(".VimballRecord is readable")
 "   call Decho("curfile<".curfile.">")
    keepalt keepjumps 1split 
-   silent! keepalt keepjumps e .VimballRecord
+   sil! keepalt keepjumps e .VimballRecord
    let keepsrch= @/
-"   call Decho("search for ^".curfile.".vba:")
-"   call Decho("search for ^".curfile."[-0-9.]*.vba:")
-   if search('^'.curfile.": ".'cw')
+"   call Decho('search for ^\M'.curfile.'.\m: ')
+"   call Decho('search for ^\M'.curfile.'.\m{vba|vmb}: ')
+"   call Decho('search for ^\M'.curfile.'\m[-0-9.]*\.{vba|vmb}: ')
+   if search('^\M'.curfile."\m: ".'cw')
 	let foundit= 1
-   elseif search('^'.curfile.".vba: ",'cw')
+   elseif search('^\M'.curfile.".\mvmb: ",'cw')
+	let foundit= 2
+   elseif search('^\M'.curfile.'\m[-0-9.]*\.vmb: ','cw')
+	let foundit= 2
+   elseif search('^\M'.curfile.".\mvba: ",'cw')
 	let foundit= 1
-   elseif search('^'.curfile.'[-0-9.]*.vba: ','cw')
+   elseif search('^\M'.curfile.'\m[-0-9.]*\.vba: ','cw')
 	let foundit= 1
    else
     let foundit = 0
    endif
    if foundit
-	let exestring  = substitute(getline("."),'^'.curfile.'\S\{-}\.vba: ','','')
+	if foundit == 1
+	 let exestring  = substitute(getline("."),'^\M'.curfile.'\m\S\{-}\.vba: ','','')
+	else
+	 let exestring  = substitute(getline("."),'^\M'.curfile.'\m\S\{-}\.vmb: ','','')
+	endif
     let s:VBRstring= substitute(exestring,'call delete(','','g')
     let s:VBRstring= substitute(s:VBRstring,"[')]",'','g')
 "	call Decho("exe ".exestring)
-	silent! keepalt keepjumps exe exestring
-	silent! keepalt keepjumps d
+	sil! keepalt keepjumps exe exestring
+	sil! keepalt keepjumps d
 	let exestring= strlen(substitute(exestring,'call delete(.\{-})|\=',"D","g"))
 "	call Decho("exestring<".exestring.">")
 	echomsg "removed ".exestring." files"
    else
     let s:VBRstring= ''
-	let curfile    = substitute(curfile,'\.vba','','')
+	let curfile    = substitute(curfile,'\.vmb','','')
 "    call Decho("unable to find <".curfile."> in .VimballRecord")
 	if !exists("s:ok_unablefind")
      call vimball#ShowMesg(s:WARNING,"(RmVimball) unable to find <".curfile."> in .VimballRecord")
 	endif
    endif
-   silent! keepalt keepjumps g/^\s*$/d
-   silent! keepalt keepjumps wq!
+   sil! keepalt keepjumps g/^\s*$/d
+   sil! keepalt keepjumps wq!
    let @/= keepsrch
   endif
   call s:ChgDir(curdir)
@@ -472,62 +485,62 @@ endfun
 
 " ---------------------------------------------------------------------
 " vimball#Decompress: attempts to automatically decompress vimballs {{{2
-fun! vimball#Decompress(fname)
-"  call Dfunc("Decompress(fname<".a:fname.">)")
+fun! vimball#Decompress(fname,...)
+"  call Dfunc("Decompress(fname<".a:fname.">) a:0=".a:0)
 
   " decompression:
   if     expand("%") =~ '.*\.gz'  && executable("gunzip")
    " handle *.gz with gunzip
-   silent exe "!gunzip ".s:Escape(a:fname)
+   silent exe "!gunzip ".shellescape(a:fname)
    if v:shell_error != 0
 	call vimball#ShowMesg(s:WARNING,"(vimball#Decompress) gunzip may have failed with <".a:fname.">")
    endif
    let fname= substitute(a:fname,'\.gz$','','')
    exe "e ".escape(fname,' \')
-   call vimball#ShowMesg(s:USAGE,"Source this file to extract it! (:so %)")
+   if a:0 == 0| call vimball#ShowMesg(s:USAGE,"Source this file to extract it! (:so %)") | endif
 
   elseif expand("%") =~ '.*\.gz' && executable("gzip")
    " handle *.gz with gzip -d
-   silent exe "!gzip -d ".s:Escape(a:fname)
+   silent exe "!gzip -d ".shellescape(a:fname)
    if v:shell_error != 0
 	call vimball#ShowMesg(s:WARNING,'(vimball#Decompress) "gzip -d" may have failed with <'.a:fname.">")
    endif
    let fname= substitute(a:fname,'\.gz$','','')
    exe "e ".escape(fname,' \')
-   call vimball#ShowMesg(s:USAGE,"Source this file to extract it! (:so %)")
+   if a:0 == 0| call vimball#ShowMesg(s:USAGE,"Source this file to extract it! (:so %)") | endif
 
   elseif expand("%") =~ '.*\.bz2' && executable("bunzip2")
    " handle *.bz2 with bunzip2
-   silent exe "!bunzip2 ".s:Escape(a:fname)
+   silent exe "!bunzip2 ".shellescape(a:fname)
    if v:shell_error != 0
 	call vimball#ShowMesg(s:WARNING,"(vimball#Decompress) bunzip2 may have failed with <".a:fname.">")
    endif
    let fname= substitute(a:fname,'\.bz2$','','')
    exe "e ".escape(fname,' \')
-   call vimball#ShowMesg(s:USAGE,"Source this file to extract it! (:so %)")
+   if a:0 == 0| call vimball#ShowMesg(s:USAGE,"Source this file to extract it! (:so %)") | endif
 
   elseif expand("%") =~ '.*\.bz2' && executable("bzip2")
    " handle *.bz2 with bzip2 -d
-   silent exe "!bzip2 -d ".s:Escape(a:fname)
+   silent exe "!bzip2 -d ".shellescape(a:fname)
    if v:shell_error != 0
 	call vimball#ShowMesg(s:WARNING,'(vimball#Decompress) "bzip2 -d" may have failed with <'.a:fname.">")
    endif
    let fname= substitute(a:fname,'\.bz2$','','')
    exe "e ".escape(fname,' \')
-   call vimball#ShowMesg(s:USAGE,"Source this file to extract it! (:so %)")
+   if a:0 == 0| call vimball#ShowMesg(s:USAGE,"Source this file to extract it! (:so %)") | endif
 
   elseif expand("%") =~ '.*\.zip' && executable("unzip")
    " handle *.zip with unzip
-   silent exe "!unzip ".s:Escape(a:fname)
+   silent exe "!unzip ".shellescape(a:fname)
    if v:shell_error != 0
 	call vimball#ShowMesg(s:WARNING,"(vimball#Decompress) unzip may have failed with <".a:fname.">")
    endif
    let fname= substitute(a:fname,'\.zip$','','')
    exe "e ".escape(fname,' \')
-   call vimball#ShowMesg(s:USAGE,"Source this file to extract it! (:so %)")
+   if a:0 == 0| call vimball#ShowMesg(s:USAGE,"Source this file to extract it! (:so %)") | endif
   endif
 
-  set noma bt=nofile fmr=[[[,]]] fdm=marker
+  if a:0 == 0| setlocal noma bt=nofile fmr=[[[,]]] fdm=marker | endif
 
 "  call Dret("Decompress")
 endfun
@@ -536,20 +549,21 @@ endfun
 " vimball#ShowMesg: {{{2
 fun! vimball#ShowMesg(level,msg)
 "  call Dfunc("vimball#ShowMesg(level=".a:level." msg<".a:msg.">)")
+
   let rulerkeep   = &ruler
   let showcmdkeep = &showcmd
   set noruler noshowcmd
   redraw!
 
   if &fo =~ '[ta]'
-   echomsg "***vimball*** " a:msg
+   echomsg "***vimball*** ".a:msg
   else
    if a:level == s:WARNING || a:level == s:USAGE
     echohl WarningMsg
    elseif a:level == s:ERROR
     echohl Error
    endif
-   echomsg "***vimball*** " a:msg
+   echomsg "***vimball*** ".a:msg
    echohl None
   endif
 
@@ -567,9 +581,19 @@ endfun
 fun! s:ChgDir(newdir)
 "  call Dfunc("ChgDir(newdir<".a:newdir.">)")
   if (has("win32") || has("win95") || has("win64") || has("win16"))
-   exe 'silent cd '.fnameescape(substitute(a:newdir,'/','\\','g'))
+   try
+    exe 'silent cd '.fnameescape(substitute(a:newdir,'/','\\','g'))
+   catch  /^Vim\%((\a\+)\)\=:E/
+    call mkdir(fnameescape(substitute(a:newdir,'/','\\','g')))
+    exe 'silent cd '.fnameescape(substitute(a:newdir,'/','\\','g'))
+   endtry
   else
-   exe 'silent cd '.fnameescape(a:newdir)
+   try
+    exe 'silent cd '.fnameescape(a:newdir)
+   catch  /^Vim\%((\a\+)\)\=:E/
+    call mkdir(fnameescape(a:newdir))
+    exe 'silent cd '.fnameescape(a:newdir)
+   endtry
   endif
 "  call Dret("ChgDir : curdir<".getcwd().">")
 endfun
@@ -609,7 +633,7 @@ fun! s:RecordInFile(home)
    let cmd= expand("%:tr").": "
 "   call Decho("cmd<".cmd.">")
 
-   silent! keepalt keepjumps e .VimballRecord
+   sil! keepalt keepjumps e .VimballRecord
    setlocal ma
    $
    if exists("s:recordfile") && exists("s:recorddir")
@@ -626,8 +650,8 @@ fun! s:RecordInFile(home)
 
    " put command into buffer, write .VimballRecord `file
    keepalt keepjumps put=cmd
-   silent! keepalt keepjumps g/^\s*$/d
-   silent! keepalt keepjumps wq!
+   sil! keepalt keepjumps g/^\s*$/d
+   sil! keepalt keepjumps wq!
    call s:ChgDir(curdir)
 
    if exists("s:recorddir")
@@ -646,9 +670,9 @@ fun! s:RecordInFile(home)
 endfun
 
 " ---------------------------------------------------------------------
-" s:VimballHome: determine/get home directory path (usually from rtp) {{{2
-fun! s:VimballHome()
-"  call Dfunc("VimballHome()")
+" vimball#VimballHome: determine/get home directory path (usually from rtp) {{{2
+fun! vimball#VimballHome()
+"  call Dfunc("vimball#VimballHome()")
   if exists("g:vimball_home")
    let home= g:vimball_home
   else
@@ -674,14 +698,14 @@ fun! s:VimballHome()
   if !isdirectory(home)
    if exists("g:vimball_mkdir")
 "	call Decho("home<".home."> isn't a directory -- making it now with g:vimball_mkdir<".g:vimball_mkdir.">")
-"    call Decho("system(".g:vimball_mkdir." ".s:Escape(home).")")
-    call system(g:vimball_mkdir." ".s:Escape(home))
+"    call Decho("system(".g:vimball_mkdir." ".shellescape(home).")")
+    call system(g:vimball_mkdir." ".shellescape(home))
    else
 "	call Decho("home<".home."> isn't a directory -- making it now with mkdir()")
     call mkdir(home)
    endif
   endif
-"  call Dret("VimballHome <".home.">")
+"  call Dret("vimball#VimballHome <".home.">")
   return home
 endfun
 
@@ -703,10 +727,11 @@ fun! vimball#SaveSettings()
   let s:repkeep = &report
   let s:vekeep  = &ve
   let s:ffkeep  = &l:ff
+  let s:swfkeep = &l:swf
   if exists("&acd")
-   setlocal ei=all ve=all noacd nofen noic report=999 nohid bt= ma lz pm= ff=unix
+   setlocal ei=all ve=all noacd nofen noic report=999 nohid bt= ma lz pm= ff=unix noswf
   else
-   setlocal ei=all ve=all       nofen noic report=999 nohid bt= ma lz pm= ff=unix
+   setlocal ei=all ve=all       nofen noic report=999 nohid bt= ma lz pm= ff=unix noswf
   endif
   " vimballs should be in unix format
   setlocal ff=unix
@@ -742,19 +767,7 @@ fun! vimball#RestoreSettings()
 "  call Dret("RestoreSettings")
 endfun
 
-" ---------------------------------------------------------------------
-" s:Escape: {{{2
-fun s:Escape(name)
-  " shellescape() was added by patch 7.0.111
-  if exists("*shellescape")
-    return shellescape(a:name)
-  endif
-  return g:netrw_shq . a:name . g:netrw_shq
-endfun
-
-" ---------------------------------------------------------------------
-"  Restore:
-let &cpo= s:keepcpo
+let &cpo = s:keepcpo
 unlet s:keepcpo
 
 " ---------------------------------------------------------------------

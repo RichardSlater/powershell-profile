@@ -1,4 +1,4 @@
-*motion.txt*    For Vim version 7.2.  Last change: 2008 Aug 03
+*motion.txt*    For Vim version 7.4.  Last change: 2013 Jul 17
 
 
 		  VIM REFERENCE MANUAL    by Bram Moolenaar
@@ -57,7 +57,7 @@ or change text.  The following operators are available:
 	|>|	>	shift right
 	|<|	<	shift left
 	|zf|	zf	define a fold
-	|g@|    g@      call function set with the 'operatorfunc' option
+	|g@|	g@	call function set with the 'operatorfunc' option
 
 If the motion includes a count and the operator also had a count before it,
 the two counts are multiplied.  For example: "2d3w" deletes six words.
@@ -104,13 +104,14 @@ strokes and has limited redo functionality.  See the chapter on Visual mode
 |Visual-mode|.
 
 You can use a ":" command for a motion.  For example "d:call FindEnd()".
-But this can't be redone with "." if the command is more than one line.
+But this can't be repeated with "." if the command is more than one line.
 This can be repeated: >
 	d:call search("f")<CR>
 This cannot be repeated: >
 	d:if 1<CR>
 	   call search("f")<CR>
 	endif<CR>
+Note that when using ":" any motion becomes characterwise exclusive.
 
 
 FORCING A MOTION TO BE LINEWISE, CHARACTERWISE OR BLOCKWISE
@@ -150,6 +151,11 @@ CTRL-V		When used after an operator, before the motion command: Force
 
 ==============================================================================
 2. Left-right motions					*left-right-motions*
+
+These commands move the cursor to the specified column in the current line.
+They stop at the first column and at the end of the line, except "$", which
+may move to one of the next lines.  See 'whichwrap' option to make some of the
+commands move across line boundaries.
 
 h		or					*h*
 <Left>		or					*<Left>*
@@ -230,11 +236,13 @@ g$ or g<End>		When lines wrap ('wrap' on): To the last character of
 			the line is not on the screen or when a count is used.
 			Additionally, vertical movements keep the column,
 			instead of going to the end of the line.
+			When 'virtualedit' is enabled moves to the end of the
+			screen line.
 			{not in Vi}
 
 							*bar*
 |			To screen column [count] in the current line.
-			|exclusive| motion.
+			|exclusive| motion.  Ceci n'est pas une pipe.
 
 							*f*
 f{char}			To [count]'th occurrence of {char} to the right.  The
@@ -264,16 +272,11 @@ T{char}			Till after [count]'th occurrence of {char} to the
 			{char} can be entered like with the |f| command.
 
 							*;*
-;			Repeat latest f, t, F or T [count] times.
+;			Repeat latest f, t, F or T [count] times. See |cpo-;|
 
 							*,*
 ,			Repeat latest f, t, F or T in opposite direction
-			[count] times.
-
-These commands move the cursor to the specified column in the current line.
-They stop at the first column and at the end of the line, except "$", which
-may move to one of the next lines.  See 'whichwrap' option to make some of the
-commands move across line boundaries.
+			[count] times. See also |cpo-;|
 
 ==============================================================================
 3. Up-down motions					*up-down-motions*
@@ -315,6 +318,7 @@ _  <underscore>		[count] - 1 lines downward, on the first non-blank
 G			Goto line [count], default last line, on the first
 			non-blank character |linewise|.  If 'startofline' not
 			set, keep the same column.
+			G is a one of |jump-motions|.
 
 							*<C-End>*
 <C-End>			Goto line [count], default last line, on the last
@@ -325,9 +329,12 @@ gg			Goto line [count], default first line, on the first
 			non-blank character |linewise|.  If 'startofline' not
 			set, keep the same column.
 
-:[range]		Set the cursor on the specified line number.  If
-			there are several numbers, the last one is used.
-
+							*:[range]*
+:[range]		Set the cursor on the last line number in [range].
+			[range] can also be just one line number, e.g., ":1"
+			or ":'m".
+			In contrast with |G| this command does not modify the
+			|jumplist|.
 							*N%*
 {count}%		Go to {count} percentage in the file, on the first
 			non-blank in the line |linewise|.  To compute the new
@@ -341,6 +348,8 @@ gg			Goto line [count], default first line, on the first
 			last number in it used as the byte count.  End-of-line
 			characters are counted depending on the current
 			'fileformat' setting.
+			Also see the |line2byte()| function, and the 'o'
+			option in 'statusline'.
 			{not in Vi}
 			{not available when compiled without the
 			|+byte_offset| feature}
@@ -508,6 +517,8 @@ always select less text than the "a" commands.
 These commands are {not in Vi}.
 These commands are not available when the |+textobjects| feature has been
 disabled at compile time.
+Also see `gn` and `gN`, operating on the last search pattern.
+
 							*v_aw* *aw*
 aw			"a word", select [count] words (see |word|).
 			Leading or trailing white space is included, but not
@@ -637,7 +648,8 @@ a`							*v_a`* *a`*
 			When the cursor starts on a quote, Vim will figure out
 			which quote pairs form a string by searching from the
 			start of the line.
-			Any trailing or leading white space is included.
+			Any trailing white space is included, unless there is
+			none, then leading white space is included.
 			When used in Visual mode it is made characterwise.
 			Repeating this object in Visual mode another string is
 			included.  A count is currently not used.
@@ -683,6 +695,7 @@ movement commands are used.
 	"daw"	delete a word				*daw*
 	"diW"	delete inner WORD (see |WORD|)		*diW*
 	"daW"	delete a WORD (see |WORD|)		*daW*
+	"dgn"   delete the next search pattern match    *dgn*
 	"dd"	delete one line				|dd|
 	"dis"	delete inner sentence			*dis*
 	"das"	delete a sentence			*das*
@@ -743,6 +756,13 @@ m'  or  m`		Set the previous context mark.  This can be jumped to
 m[  or  m]		Set the |'[| or |']| mark.  Useful when an operator is
 			to be simulated by multiple commands.  (does not move
 			the cursor, this is not a motion command).
+
+						*m<* *m>*
+m<  or  m>		Set the |'<| or |'>| mark.  Useful to change what the
+			`gv` command selects.  (does not move the cursor, this
+			is not a motion command).
+			Note that the Visual mode cannot be set, only the
+			start and end position.
 
 						*:ma* *:mark* *E191*
 :[range]ma[rk] {a-zA-Z'}
@@ -1006,43 +1026,41 @@ unless the line containing that position was changed or deleted.
 							*CTRL-O*
 CTRL-O			Go to [count] Older cursor position in jump list
 			(not a motion command).  {not in Vi}
-			{not available without the +jumplist feature}
+			{not available without the |+jumplist| feature}
 
 <Tab>		or					*CTRL-I* *<Tab>*
 CTRL-I			Go to [count] newer cursor position in jump list
 			(not a motion command).
-			In a |quickfix-window| it takes you to the position of
-			the error under the cursor.
 			{not in Vi}
-			{not available without the +jumplist feature}
+			{not available without the |+jumplist| feature}
 
 							*:ju* *:jumps*
 :ju[mps]		Print the jump list (not a motion command).  {not in
-			Vi} {not available without the +jumplist feature}
+			Vi} {not available without the |+jumplist| feature}
 
 							*jumplist*
 Jumps are remembered in a jump list.  With the CTRL-O and CTRL-I command you
 can go to cursor positions before older jumps, and back again.  Thus you can
 move up and down the list.  There is a separate jump list for each window.
 The maximum number of entries is fixed at 100.
-{not available without the +jumplist feature}
+{not available without the |+jumplist| feature}
 
 For example, after three jump commands you have this jump list:
 
-  jump line  col file/line ~
+  jump line  col file/text ~
     3	  1    0 some text ~
     2	 70    0 another line ~
     1  1154   23 end. ~
  > ~
 
-The "file/line" column shows the file name, or the text at the jump if it is
+The "file/text" column shows the file name, or the text at the jump if it is
 in the current file (an indent is removed and a long line is truncated to fit
 in the window).
 
 You are currently in line 1167.  If you then use the CTRL-O command, the
 cursor is put in line 1154.  This results in:
 
-  jump line  col file/line ~
+  jump line  col file/text ~
     2	  1    0 some text ~
     1	 70    0 another line ~
  >  0  1154   23 end. ~
@@ -1067,12 +1085,13 @@ only once.
 
 When the |:keepjumps| command modifier is used, jumps are not stored in the
 jumplist.  Jumps are also not stored in other cases, e.g., in a |:global|
-command.  You can explicitly add a jump by setting the ' mark.
+command.  You can explicitly add a jump by setting the ' mark with "m'".  Note
+that calling setpos() does not do this.
 
 After the CTRL-O command that got you into line 1154 you could give another
 jump command (e.g., "G").  The jump list would then become:
 
-  jump line  col file/line ~
+  jump line  col file/text ~
     4	  1    0 some text ~
     3	 70    0 another line ~
     2  1167    0 foo bar ~
@@ -1102,14 +1121,14 @@ g;			Go to [count] older position in change list.
 			If there is no older change an error message is given.
 			(not a motion command)
 			{not in Vi}
-			{not available without the +jumplist feature}
+			{not available without the |+jumplist| feature}
 
 							*g,* *E663*
 g,			Go to [count] newer cursor position in change list.
 			Just like |g;| but in the opposite direction.
 			(not a motion command)
 			{not in Vi}
-			{not available without the +jumplist feature}
+			{not available without the |+jumplist| feature}
 
 When using a count you jump as far back or forward as possible.  Thus you can
 use "999g;" to go to the first change for which the position is still

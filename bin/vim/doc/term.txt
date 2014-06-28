@@ -1,4 +1,4 @@
-*term.txt*      For Vim version 7.2.  Last change: 2008 Jun 21
+*term.txt*      For Vim version 7.4.  Last change: 2013 Mar 13
 
 
 		  VIM REFERENCE MANUAL    by Bram Moolenaar
@@ -294,6 +294,8 @@ Added by Vim (there are no standard codes for these):
 		|termcap-cursor-shape|
 	t_RV	request terminal version string (for xterm)	*t_RV* *'t_RV'*
 		|xterm-8bit| |v:termresponse| |'ttymouse'| |xterm-codes|
+	t_u7	request cursor position (for xterm)		*t_u7* *'t_u7'*
+		see |'ambiwidth'|
 
 KEY CODES
 Note: Use the <> form if possible
@@ -326,7 +328,7 @@ Note: Use the <> form if possible
 	t_k8	<F8>		function key 8		*<F8>*	*t_k8* *'t_k8'*
 	t_k9	<F9>		function key 9		*<F9>*	*t_k9* *'t_k9'*
 	t_k;	<F10>		function key 10		*<F10>*	*t_k;* *'t_k;'*
-	t_F1	<F11>		function key 11		*<F11>* *t_F1* *'t_F1'*
+	t_F1	<F11>		function key 11		*<F11>*	*t_F1* *'t_F1'*
 	t_F2	<F12>		function key 12		*<F12>*	*t_F2* *'t_F2'*
 	t_F3	<F13>		function key 13		*<F13>*	*t_F3* *'t_F3'*
 	t_F4	<F14>		function key 14		*<F14>*	*t_F4* *'t_F4'*
@@ -356,9 +358,9 @@ Note: Use the <> form if possible
 	t_kI	<Insert>	insert key			*t_kI* *'t_kI'*
 	t_kD	<Del>		delete key			*t_kD* *'t_kD'*
 	t_kb	<BS>		backspace key			*t_kb* *'t_kb'*
-	t_kB	<S-Tab>		back-tab (shift-tab)  *<S-Tab>* *t_kB* *'t_kB'*
+	t_kB	<S-Tab>		back-tab (shift-tab)  *<S-Tab>*	*t_kB* *'t_kB'*
 	t_kh	<Home>		home key			*t_kh* *'t_kh'*
-	t_#2	<S-Home>	shifted home key     *<S-Home>* *t_#2* *'t_#2'*
+	t_#2	<S-Home>	shifted home key     *<S-Home>*	*t_#2* *'t_#2'*
 		<xHome>		alternate home key		*<xHome>*
 	t_@7	<End>		end key				*t_@7* *'t_@7'*
 	t_*7	<S-End>		shifted end key	*<S-End>* *t_star7* *'t_star7'*
@@ -371,8 +373,8 @@ Note: Use the <> form if possible
 	t_K5	<kPageDown>	keypad page-down key		*t_K5* *'t_K5'*
 	t_K6	<kPlus>		keypad plus key	      *<kPlus>*	*t_K6* *'t_K6'*
 	t_K7	<kMinus>	keypad minus key     *<kMinus>*	*t_K7* *'t_K7'*
-	t_K8	<kDivide>	keypad divide	    *<kDivide>* *t_K8* *'t_K8'*
-	t_K9	<kMultiply>	keypad multiply   *<kMultiply>* *t_K9* *'t_K9'*
+	t_K8	<kDivide>	keypad divide	    *<kDivide>*	*t_K8* *'t_K8'*
+	t_K9	<kMultiply>	keypad multiply   *<kMultiply>*	*t_K9* *'t_K9'*
 	t_KA	<kEnter>	keypad enter key     *<kEnter>*	*t_KA* *'t_KA'*
 	t_KB	<kPoint>	keypad decimal point *<kPoint>*	*t_KB* *'t_KB'*
 	t_KC	<k0>		keypad 0		 *<k0>*	*t_KC* *'t_KC'*
@@ -410,6 +412,21 @@ VT220, etc.).  The result is that codes like <xF1> are no longer needed.
 Note: This is only done on startup.  If the xterm options are changed after
 Vim has started, the escape sequences may not be recognized any more.
 
+							*xterm-resize*
+Window resizing with xterm only works if the allowWindowOps resource is
+enabled.  On some systems and versions of xterm it's disabled by default
+because someone thought it would be a security issue.  It's not clear if this
+is actually the case.
+
+To overrule the default, put this line in your ~/.Xdefaults or
+~/.Xresources:
+>
+	XTerm*allowWindowOps: 		true
+
+And run "xrdb -merge .Xresources" to make it effective.  You can check the
+value with the context menu (right mouse button while CTRL key is pressed),
+there should be a tick at allow-window-ops.
+
 							*termcap-colors*
 Note about colors: The 't_Co' option tells Vim the number of colors available.
 When it is non-zero, the 't_AB' and 't_AF' options are used to set the color.
@@ -428,7 +445,7 @@ Example for an xterm, this changes the color of the cursor: >
     endif
 NOTE: When Vim exits the shape for Normal mode will remain.  The shape from
 before Vim started will not be restored.
-{not available when compiled without the +cursorshape feature}
+{not available when compiled without the |+cursorshape| feature}
 
 							*termcap-title*
 The 't_ts' and 't_fs' options are used to set the window title if the terminal
@@ -579,7 +596,7 @@ This section is about using the mouse on a terminal or a terminal window.  How
 to use the mouse in a GUI window is explained in |gui-mouse|.  For scrolling
 with a mouse wheel see |scroll-mouse-wheel|.
 
-Don't forget to enable the mouse with this commands: >
+Don't forget to enable the mouse with this command: >
 	:set mouse=a
 Otherwise Vim won't recognize the mouse in all modes (See 'mouse').
 
@@ -650,6 +667,7 @@ When the X-server clipboard is available, the command server described in
 							*xterm-copy-paste*
 NOTE: In some (older) xterms, it's not possible to move the cursor past column
 95.  This is an xterm problem, not Vim's.  Get a newer xterm |color-xterm|.
+Now the limit is 223 columns.
 
 Copy/paste in xterm with (current mode NOT included in 'mouse'):
 1. Press left mouse button on first letter of text, move mouse pointer to last

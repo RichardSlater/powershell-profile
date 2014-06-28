@@ -1,7 +1,7 @@
 " These commands create the option window.
 "
 " Maintainer:	Bram Moolenaar <Bram@vim.org>
-" Last Change:	2008 May 12
+" Last Change:	2013 Jun 29
 
 " If there already is an option window, jump to that one.
 if bufwinnr("option-window") > 0
@@ -10,7 +10,7 @@ if bufwinnr("option-window") > 0
     if @% == "option-window"
       finish
     endif
-    exe "norm! \<C-W>w"
+    wincmd w
     if s:thiswin == winnr()
       break
     endif
@@ -26,12 +26,8 @@ set cpo&vim
 fun! <SID>CR()
 
   " If on a continued comment line, go back to the first comment line
-  let lnum = line(".")
+  let lnum = search("^[^\t]", 'bWcn')
   let line = getline(lnum)
-  while line[0] == "\t"
-    let lnum = lnum - 1
-    let line = getline(lnum)
-  endwhile
 
   " <CR> on a "set" line executes the option line
   if match(line, "^ \tset ") >= 0
@@ -82,11 +78,11 @@ fun! <SID>Find(lnum)
     if getline(a:lnum - 1) =~ "(local to"
       let local = 1
       let thiswin = winnr()
-      exe "norm! \<C-W>p"
+      wincmd p
       if exists("b:current_syntax") && b:current_syntax == "help"
-	exe "norm! \<C-W>j"
+	wincmd j
 	if winnr() == thiswin
-	  exe "norm! \<C-W>j"
+	  wincmd j
 	endif
       endif
     else
@@ -111,10 +107,10 @@ fun! <SID>Update(lnum, line, local, thiswin)
   if name == "pt" && &pt =~ "\x80"
     let val = <SID>PTvalue()
   else
-    exe "let val = substitute(&" . name . ', "[ \\t\\\\\"|]", "\\\\\\0", "g")'
+    let val = escape(eval('&' . name), " \t\\\"|")
   endif
   if a:local
-    exe "norm! " . a:thiswin . "\<C-W>w"
+    exe a:thiswin . "wincmd w"
   endif
   if match(a:line, "=") >= 0 || (val != "0" && val != "1")
     call setline(a:lnum, " \tset " . name . "=" . val)
@@ -139,7 +135,7 @@ set notitle noicon nosc noru
 " Relies on syntax highlighting to be switched on.
 let s:thiswin = winnr()
 while exists("b:current_syntax") && b:current_syntax == "help"
-  exe "norm! \<C-W>w"
+  wincmd w
   if s:thiswin == winnr()
     break
   endif
@@ -147,7 +143,7 @@ endwhile
 
 " Open the window
 new option-window
-setlocal ts=15 tw=0 noro
+setlocal ts=15 tw=0 noro buftype=nofile
 
 " Insert help and a "set" command for each option.
 call append(0, '" Each "set" line shows the current value of an option (on the left).')
@@ -162,9 +158,7 @@ call append(6, '" Hit <Space> on a "set" line to refresh it.')
 
 " Init a local binary option
 fun! <SID>BinOptionL(name)
-  exe "norm! \<C-W>p"
-  exe "let val = &" . a:name
-  exe "norm! \<C-W>p"
+  let val = getwinvar(winnr('#'), '&' . a:name)
   call append("$", substitute(substitute(" \tset " . val . a:name . "\t" .
 	\!val . a:name, "0", "no", ""), "1", "", ""))
 endfun
@@ -177,16 +171,13 @@ endfun
 
 " Init a local string option
 fun! <SID>OptionL(name)
-  exe "norm! \<C-W>p"
-  exe "let val = substitute(&" . a:name . ', "[ \\t\\\\\"|]", "\\\\\\0", "g")'
-  exe "norm! \<C-W>p"
+  let val = escape(getwinvar(winnr('#'), '&' . a:name), " \t\\\"|")
   call append("$", " \tset " . a:name . "=" . val)
 endfun
 
 " Init a global string option
 fun! <SID>OptionG(name, val)
-  call append("$", " \tset " . a:name . "=" . substitute(a:val, '[ \t\\"|]',
-	\ '\\\0', "g"))
+  call append("$", " \tset " . a:name . "=" . escape(a:val, " \t\\\"|"))
 endfun
 
 let s:idx = 1
@@ -257,7 +248,7 @@ call append("$", "\t(global or local to buffer)")
 call <SID>OptionG("pa", &pa)
 call append("$", "cdpath\tlist of directory names used for :cd")
 call <SID>OptionG("cd", &cd)
-if has("netbeans_intg") || has("sun_workshop")
+if exists("+autochdir")
   call append("$", "autochdir\tchange to directory of file in buffer")
   call <SID>BinOptionG("acd", &acd)
 endif
@@ -267,11 +258,13 @@ call append("$", "incsearch\tshow match for partly typed search command")
 call <SID>BinOptionG("is", &is)
 call append("$", "magic\tchange the way backslashes are used in search patterns")
 call <SID>BinOptionG("magic", &magic)
+call append("$", "regexpengine\tselect the default regexp engine used")
+call <SID>OptionG("re", &re)
 call append("$", "ignorecase\tignore case when using a search pattern")
 call <SID>BinOptionG("ic", &ic)
 call append("$", "smartcase\toverride 'ignorecase' when pattern has upper case characters")
 call <SID>BinOptionG("scs", &scs)
-call append("$", "casemap\tWhat method to use for changing case of letters")
+call append("$", "casemap\twhat method to use for changing case of letters")
 call <SID>OptionG("cmp", &cmp)
 call append("$", "maxmempattern\tmaximum amount of memory in Kbyte used for pattern matching")
 call append("$", " \tset mmp=" . &mmp)
@@ -313,8 +306,10 @@ if has("cscope")
   call <SID>BinOptionG("csverb", &csverb)
   call append("$", "cscopepathcomp\thow many components of the path to show")
   call append("$", " \tset cspc=" . &cspc)
-  call append("$", "cscopequickfix\tWhen to open a quickfix window for cscope")
+  call append("$", "cscopequickfix\twhen to open a quickfix window for cscope")
   call <SID>OptionG("csqf", &csqf)
+  call append("$", "cscoperelative\tfile names in a cscope file are relative to that file")
+  call <SID>BinOptionG("csre", &csre)
 endif
 
 
@@ -348,6 +343,8 @@ call append("$", "columns\twidth of the display")
 call append("$", " \tset co=" . &co)
 call append("$", "lines\tnumber of lines in the display")
 call append("$", " \tset lines=" . &lines)
+call append("$", "window\tnumber of lines to scroll for CTRL-F and CTRL-B")
+call append("$", " \tset window=" . &window)
 call append("$", "lazyredraw\tdon't redraw while executing macros")
 call <SID>BinOptionG("lz", &lz)
 if has("reltime")
@@ -365,10 +362,21 @@ call <SID>OptionG("lcs", &lcs)
 call append("$", "number\tshow the line number for each line")
 call append("$", "\t(local to window)")
 call <SID>BinOptionL("nu")
+call append("$", "relativenumber\tshow the relative line number for each line")
+call append("$", "\t(local to window)")
+call <SID>BinOptionL("rnu")
 if has("linebreak")
   call append("$", "numberwidth\tnumber of columns to use for the line number")
   call append("$", "\t(local to window)")
   call <SID>OptionL("nuw")
+endif
+if has("conceal")
+  call append("$", "conceallevel\tcontrols whether concealable text is hidden")
+  call append("$", "\t(local to window)")
+  call <SID>OptionL("cole")
+  call append("$", "concealcursor\tmodes in which text in the cursor line can be concealed")
+  call append("$", "\t(local to window)")
+  call <SID>OptionL("cocu")
 endif
 
 
@@ -399,6 +407,9 @@ if has("syntax")
   call append("$", "cursorline\thighlight the screen line of the cursor")
   call append("$", "\t(local to window)")
   call <SID>BinOptionL("cul")
+  call append("$", "colorcolumn\tcolumns to highlight")
+  call append("$", "\t(local to window)")
+  call <SID>OptionL("cc")
   call append("$", "spell\thighlight spelling mistakes")
   call append("$", "\t(local to window)")
   call <SID>BinOptionL("spell")
@@ -473,6 +484,11 @@ if has("scrollbind")
   call <SID>BinOptionL("scb")
   call append("$", "scrollopt\t\"ver\", \"hor\" and/or \"jump\"; list of options for 'scrollbind'")
   call <SID>OptionG("sbo", &sbo)
+endif
+if has("cursorbind")
+  call append("$", "cursorbind\tthis window's cursor moves together with other bound windows")
+  call append("$", "\t(local to window)")
+  call <SID>BinOptionL("crb")
 endif
 
 
@@ -578,7 +594,7 @@ if has("gui")
     call append("$", "toolbar\t\"icons\", \"text\" and/or \"tooltips\"; how to show the toolbar")
     call <SID>OptionG("tb", &tb)
     if has("gui_gtk2")
-      call append("$", "toolbariconsize\tSize of toolbar icons")
+      call append("$", "toolbariconsize\tsize of toolbar icons")
       call <SID>OptionG("tbis", &tbis)
     endif
     call append("$", "guiheadroom\troom (in pixels) left above/below the window")
@@ -703,6 +719,8 @@ call <SID>OptionG("km", &km)
 call <SID>Header("editing text")
 call append("$", "undolevels\tmaximum number of changes that can be undone")
 call append("$", " \tset ul=" . &ul)
+call append("$", "undoreload\tmaximum number lines to save for undo on a buffer reload")
+call append("$", " \tset ur=" . &ur)
 call append("$", "modified\tchanges have been made and not written to a file")
 call append("$", "\t(local to buffer)")
 call <SID>BinOptionL("mod")
@@ -766,7 +784,7 @@ call append("$", "tildeop\tthe \"~\" command behaves like an operator")
 call <SID>BinOptionG("top", &top)
 call append("$", "operatorfunc\tfunction called for the\"g@\"  operator")
 call <SID>OptionG("opfunc", &opfunc)
-call append("$", "showmatch\tWhen inserting a bracket, briefly jump to its match")
+call append("$", "showmatch\twhen inserting a bracket, briefly jump to its match")
 call <SID>BinOptionG("sm", &sm)
 call append("$", "matchtime\ttenth of a second to show a match for 'showmatch'")
 call append("$", " \tset mat=" . &mat)
@@ -826,10 +844,10 @@ if has("cindent")
   call append("$", "\t(local to buffer)")
   call <SID>OptionL("indk")
 endif
-call append("$", "copyindent\tCopy whitespace for indenting from previous line")
+call append("$", "copyindent\tcopy whitespace for indenting from previous line")
 call append("$", "\t(local to buffer)")
 call <SID>BinOptionL("ci")
-call append("$", "preserveindent\tPreserve kind of whitespace when changing indent")
+call append("$", "preserveindent\tpreserve kind of whitespace when changing indent")
 call append("$", "\t(local to buffer)")
 call <SID>BinOptionL("pi")
 if has("lispindent")
@@ -926,7 +944,7 @@ call append("$", "endofline\tlast line in the file has an end-of-line")
 call append("$", "\t(local to buffer)")
 call <SID>BinOptionL("eol")
 if has("multi_byte")
-  call append("$", "bomb\tPrepend a Byte Order Mark to the file")
+  call append("$", "bomb\tprepend a Byte Order Mark to the file")
   call append("$", "\t(local to buffer)")
   call <SID>BinOptionL("bomb")
 endif
@@ -972,6 +990,9 @@ if !has("msdos")
   call append("$", "\t(local to buffer)")
   call <SID>BinOptionL("sn")
 endif
+call append("$", "cryptmethod\tencryption method for file writing: zip or blowfish")
+call append("$", "\t(local to buffer)")
+call <SID>OptionL("cm")
 
 
 call <SID>Header("the swap file")
@@ -1016,6 +1037,10 @@ if has("wildignore")
   call append("$", "wildignore\tlist of patterns to ignore files for file name completion")
   call <SID>OptionG("wig", &wig)
 endif
+call append("$", "fileignorecase\tignore case when using file names")
+call <SID>BinOptionG("fic", &fic)
+call append("$", "wildignorecase\tignore case when completing file names")
+call <SID>BinOptionG("wic", &wic)
 if has("wildmenu")
   call append("$", "wildmenu\tcommand-line completion shows a list of matches")
   call <SID>BinOptionG("wmnu", &wmnu)
@@ -1026,6 +1051,10 @@ if has("vertsplit")
   call append("$", "cmdwinheight\theight of the command-line window")
   call <SID>OptionG("cwh", &cwh)
 endif
+call append("$", "undofile\tautomatically save and restore undo history")
+call <SID>BinOptionG("udf", &udf)
+call append("$", "undodir\tlist of directories for undo files")
+call <SID>OptionG("udir", &udir)
 
 
 call <SID>Header("executing external commands")
@@ -1039,6 +1068,8 @@ call append("$", "shellquote\tcharacter(s) to enclose a shell command in")
 call <SID>OptionG("shq", &shq)
 call append("$", "shellxquote\tlike 'shellquote' but include the redirection")
 call <SID>OptionG("sxq", &sxq)
+call append("$", "shellxescape\tcharacters to escape when 'shellxquote' is (")
+call <SID>OptionG("sxe", &sxe)
 call append("$", "shellcmdflag\targument for 'shell' to execute a command")
 call <SID>OptionG("shcf", &shcf)
 call append("$", "shellredir\tused to redirect command output to a file")
@@ -1117,12 +1148,12 @@ if has("rightleft")
   call append("$", "rightleft\tdisplay the buffer right-to-left")
   call append("$", "\t(local to window)")
   call <SID>BinOptionL("rl")
-  call append("$", "rightleftcmd\tWhen to edit the command-line right-to-left")
+  call append("$", "rightleftcmd\twhen to edit the command-line right-to-left")
   call append("$", "\t(local to window)")
   call <SID>OptionL("rlc")
-  call append("$", "revins\tInsert characters backwards")
+  call append("$", "revins\tinsert characters backwards")
   call <SID>BinOptionG("ri", &ri)
-  call append("$", "allowrevins\tAllow CTRL-_ in Insert and Command-line mode to toggle 'revins'")
+  call append("$", "allowrevins\tallow CTRL-_ in Insert and Command-line mode to toggle 'revins'")
   call <SID>BinOptionG("ari", &ari)
   call append("$", "aleph\tthe ASCII code for the first letter of the Hebrew alphabet")
   call append("$", " \tset al=" . &al)
@@ -1138,12 +1169,12 @@ if has("farsi")
   call <SID>BinOptionG("fk", &fk)
 endif
 if has("arabic")
-  call append("$", "arabic\tPrepare for editing Arabic text")
+  call append("$", "arabic\tprepare for editing Arabic text")
   call append("$", "\t(local to window)")
   call <SID>BinOptionL("arab")
-  call append("$", "arabicshape\tPerform shaping of Arabic characters")
+  call append("$", "arabicshape\tperform shaping of Arabic characters")
   call <SID>BinOptionG("arshape", &arshape)
-  call append("$", "termbidi\tTerminal will perform bidi handling")
+  call append("$", "termbidi\tterminal will perform bidi handling")
   call <SID>BinOptionG("tbidi", &tbidi)
 endif
 if has("keymap")
@@ -1167,6 +1198,10 @@ call <SID>OptionL("ims")
 if has("xim")
   call append("$", "imcmdline\twhen set always use IM when starting to edit a command line")
   call <SID>BinOptionG("imc", &imc)
+  call append("$", "imstatusfunc\tfunction to obtain IME status")
+  call <SID>OptionG("imsf", &imsf)
+  call append("$", "imactivatefunc\tfunction to enable/disable IME")
+  call <SID>OptionG("imaf", &imaf)
 endif
 
 
@@ -1184,15 +1219,15 @@ if has("multi_byte")
   call <SID>OptionG("tenc", &tenc)
   call append("$", "charconvert\texpression used for character encoding conversion")
   call <SID>OptionG("ccv", &ccv)
-  call append("$", "delcombine\tDelete combining (composing) characters on their own")
+  call append("$", "delcombine\tdelete combining (composing) characters on their own")
   call <SID>BinOptionG("deco", &deco)
-  call append("$", "maxcombine\tMaximum number of combining (composing) characters displayed")
+  call append("$", "maxcombine\tmaximum number of combining (composing) characters displayed")
   call <SID>OptionG("mco", &mco)
   if has("xim") && has("gui_gtk")
     call append("$", "imactivatekey\tkey that activates the X input method")
     call <SID>OptionG("imak", &imak)
   endif
-  call append("$", "ambiwidth\tWidth of ambiguous width characters")
+  call append("$", "ambiwidth\twidth of ambiguous width characters")
   call <SID>OptionG("ambw", &ambw)
 endif
 
@@ -1310,3 +1345,5 @@ let &ru = s:old_ru
 let &sc = s:old_sc
 let &cpo = s:cpo_save
 unlet s:old_title s:old_icon s:old_ru s:old_sc s:cpo_save s:idx s:lnum
+
+" vim: ts=8 sw=2 sts=2

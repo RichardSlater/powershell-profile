@@ -2,7 +2,7 @@
 " Language:		Clean
 " Author:		Pieter van Engelen <pietere@sci.kun.nl>
 " Co-Author:	Arthur van Leeuwen <arthurvl@sci.kun.nl>
-" Last Change:	Fri Sep 29 11:35:34 CEST 2000
+" Last Change:	2013 Jun 19 by Jurriën Stutterheim
 
 " For version 5.x: Clear all syntax items
 " For version 6.x: Quit when a syntax file was already loaded
@@ -12,16 +12,22 @@ elseif exists("b:current_syntax")
   finish
 endif
 
+let s:cpo_save = &cpo
+set cpo&vim
+
 " Some Clean-keywords
 syn keyword cleanConditional if case
 syn keyword cleanLabel let! with where in of
-syn keyword cleanInclude from import
 syn keyword cleanSpecial Start
 syn keyword cleanKeyword infixl infixr infix
 syn keyword cleanBasicType Int Real Char Bool String
 syn keyword cleanSpecialType World ProcId Void Files File
 syn keyword cleanModuleSystem module implementation definition system
 syn keyword cleanTypeClass class instance export
+
+" Import highlighting
+syn region cleanIncludeRegion start="^\s*\(from\|import\|\s\+\(as\|qualified\)\)" end="\n" contains=cleanIncludeKeyword keepend
+syn keyword cleanIncludeKeyword contained from import as qualified
 
 " To do some Denotation Highlighting
 syn keyword cleanBoolDenot True False
@@ -71,7 +77,7 @@ if version >= 508 || !exists("did_clean_syntax_init")
    HiLink cleanLabel		Label
    HiLink cleanKeyword      Keyword
    " Generic Preprocessing
-   HiLink cleanInclude      Include
+   HiLink cleanIncludeKeyword      Include
    HiLink cleanModuleSystem PreProc
    " Type
    HiLink cleanBasicType    Type
@@ -91,4 +97,6 @@ endif
 
 let b:current_syntax = "clean"
 
+let &cpo = s:cpo_save
+unlet s:cpo_save
 " vim: ts=4

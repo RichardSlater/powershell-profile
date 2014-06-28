@@ -1,15 +1,15 @@
 "------------------------------------------------------------------------------
 "  Description: Vim Ada indent file
 "     Language: Ada (2005)
-"	   $Id: ada.vim,v 1.12 2008/08/09 17:42:43 vimboss Exp $
+"	   $Id: ada.vim 887 2008-07-08 14:29:01Z krischik $
 "    Copyright: Copyright (C) 2006 Martin Krischik
 "   Maintainer: Martin Krischik <krischik@users.sourceforge.net>
 "		Neil Bird <neil@fnxweb.com>
 "		Ned Okie <nokie@radford.edu>
-"      $Author: vimboss $
-"	 $Date: 2008/08/09 17:42:43 $
+"      $Author: krischik $
+"	 $Date: 2008-07-08 16:29:01 +0200 (Di, 08 Jul 2008) $
 "      Version: 4.6
-"    $Revision: 1.12 $
+"    $Revision: 887 $
 "     $HeadURL: https://gnuada.svn.sourceforge.net/svnroot/gnuada/trunk/tools/vim/indent/ada.vim $
 "      History: 24.05.2006 MK Unified Headers
 "		16.07.2006 MK Ada-Mode as vim-ball
@@ -39,6 +39,8 @@ setlocal indentkeys+=0=~then,0=~end,0=~elsif,0=~when,0=~exception,0=~begin,0=~is
 if exists("*GetAdaIndent")
    finish
 endif
+let s:keepcpo= &cpo
+set cpo&vim
 
 if exists("g:ada_with_gnat_project_files")
    let s:AdaBlockStart = '^\s*\(if\>\|while\>\|else\>\|elsif\>\|loop\>\|for\>.*\<\(loop\|use\)\>\|declare\>\|begin\>\|type\>.*\<is\>[^;]*$\|\(type\>.*\)\=\<record\>\|procedure\>\|function\>\|accept\>\|do\>\|task\>\|package\>\|project\>\|then\>\|when\>\|is\>\)'
@@ -291,6 +293,9 @@ function GetAdaIndent()
 
    return ind
 endfunction GetAdaIndent
+
+let &cpo = s:keepcpo
+unlet s:keepcpo
 
 finish " 1}}}
 
