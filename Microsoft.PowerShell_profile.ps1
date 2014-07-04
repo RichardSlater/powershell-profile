@@ -73,7 +73,7 @@ Function Set-AmidoGitConfiguration {
 
   $sshKey = ssh-add -L | Select-String "richard.slater@amido.co.uk";
   if (!$sshKey) {
-    $sshKeyFile = Join-Path $env:USERPROFILE "Dropbox\SSH\richard.slater@amido.co.uk.pem";
+    $sshKeyFile = Join-Path $env:USERPROFILE "Dropbox\SSH\richard.slater@amido.co.uk-2013.pem";
     ssh-add $sshKeyFile;
   }
 }
