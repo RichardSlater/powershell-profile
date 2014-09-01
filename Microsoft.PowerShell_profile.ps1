@@ -2,7 +2,8 @@ $ProfilePath    = Split-Path $PROFILE;
 $ScriptPath     = Join-Path $ProfilePath bin;
 $VimPath        = Join-Path $ScriptPath "\vim\vim.exe";
 $GourcePath     = Join-Path $ScriptPath "\gource\gource.exe";
-$SublimePath    = Join-Path $env:ProgramFiles "\Sublime Text 3\sublime_text.exe";
+$SublimePath    = "C:\Program Files\Sublime Text 3\sublime_text.exe";
+$BeyondCompPath = "C:\Program Files (x86)\Beyond Compare 4\BComp.exe";
 $DcrawPath      = Join-Path $ScriptPath "\dcraw\dcraw.exe";
 $CJpegRootPath  = Join-Path $ScriptPath "cjpeg";
 $cjpegPath      = Join-Path $CJpegRootPath "cjpeg\Release\cjpeg.exe";
@@ -63,6 +64,8 @@ Function Set-GitCore {
   git config --global core.excludesfile $gitIgnorePath;
   git config --global mergetool.vimdiff3.cmd 'vim -f -d -c "wincmd J" "$MERGED" "$LOCAL" "$BASE" "$REMOTE"';
   git config --global merge.tool vimdiff3;
+  git config --global diff.tool.bc4;
+  git config --global difftool.bc4.path $BeyondCompPath;
   git config --global branch.autosetupmerge true;
 }
 
@@ -141,4 +144,5 @@ Function Initialize-Ruby() {
 }
 
 Set-StrictMode -Version Latest;
-$Global:DebugPreference = "Continue";
+$Global:DebugPreference = "SilentlyContinue";
+$Global:VerbosePreference = "SilentlyContinue";
