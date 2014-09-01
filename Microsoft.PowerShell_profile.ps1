@@ -73,7 +73,7 @@ Function Set-AmidoGitConfiguration {
 
   $sshKey = ssh-add -L | Select-String "richard.slater@amido.co.uk";
   if (!$sshKey) {
-    $sshKeyFile = Join-Path $env:USERPROFILE "Dropbox\SSH\richard.slater@amido.co.uk-2013.pem";
+    $sshKeyFile = Join-Path $env:USERPROFILE "Dropbox\SSH\richard.slater@amido.co.uk-2013_rsa";
     ssh-add $sshKeyFile;
   }
 }
@@ -85,7 +85,7 @@ Function Set-PersonalGitConfiguration {
 
   $sshKey = ssh-add -L | Select-String "github@richard-slater.co.uk";
   if (!$sshKey) {
-    $sshKeyFile = Join-Path $env:USERPROFILE "Dropbox\SSH\github@richard-slater.co.uk-2011.pem";
+    $sshKeyFile = Join-Path $env:USERPROFILE "Dropbox\SSH\github@richard-slater.co.uk-2011_rsa";
     ssh-add $sshKeyFile;
   }
 }
@@ -138,26 +138,6 @@ Function Initialize-Ruby() {
   ./setrbvars.bat;
   Pop-Location;
   Write-Host "`nRuby Environment Configured." -ForegroundColor Green;
-}
-
-function Import-PfxCertificate {
-  param(
-    [String]$certPath,
-    [String]$certRootStore = "CurrentUser",
-    [String]$certStore = "My",
-    $pfxPass = $null
-  )
-
-  $pfx = New-Object System.Security.Cryptography.X509Certificates.X509Certificate2;
-
-  if ($pfxPass -eq $null) { $pfxPass = Read-Host "Enter the pfx password" -AsSecureString };
-  
-  $pfx.import((Resolve-Path $certPath), $pfxPass, "Exportable,PersistKeySet");
-  
-  $store = New-Object System.Security.Cryptography.X509Certificates.X509Store($certStore, $certRootStore);
-  $store.Open("MaxAllowed");
-  $store.Add($pfx);
-  $store.Close(); 
 }
 
 Set-StrictMode -Version Latest;
