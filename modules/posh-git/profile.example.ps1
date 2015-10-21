@@ -12,18 +12,17 @@ Import-Module .\posh-git
 function global:prompt {
     $realLASTEXITCODE = $LASTEXITCODE
 
-    # Reset color, which can be messed up by Enable-GitColors
-    $Host.UI.RawUI.ForegroundColor = $GitPromptSettings.DefaultForegroundColor
+    if (Test-Path variable:/PSDebugContext) {
+        Write-Host '[DBG] ' -ForegroundColor Red;
+    } 
 
-    Write-Host($pwd.ProviderPath) -nonewline
+    Write-Host (Split-Path -Resolve $pwd -Leaf) -NoNewLine -ForegroundColor Cyan;
 
-    Write-VcsStatus
+    Write-VcsStatus;
 
-    $global:LASTEXITCODE = $realLASTEXITCODE
-    return "> "
+    $global:LASTEXITCODE = $realLASTEXITCODE;
+    return "> ";
 }
-
-Enable-GitColors
 
 Pop-Location
 

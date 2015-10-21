@@ -17,6 +17,23 @@ $logstalgiaPath = Join-Path $ScriptPath "logstalgia\logstalgia.exe";
 . $($ProfilePath + '\Modules\posh-git\profile.example.ps1'); # Posh-Git
 . $($ProfilePath + '\scripts\Get-ChildItemColor.ps1'); # Command Wrapper used by ll
 
+function global:prompt {
+    $realLASTEXITCODE = $LASTEXITCODE
+
+    if (Test-Path variable:/PSDebugContext) {
+        Write-Host '[DBG] ' -ForegroundColor Red -NoNewLine;
+    } else {
+        Write-Host '[PS] ' -ForegroundColor White -NoNewLine;
+    } 
+
+    Write-Host (Split-Path -Resolve $pwd -Leaf) -NoNewLine -ForegroundColor Cyan;
+
+    Write-VcsStatus;
+
+    $global:LASTEXITCODE = $realLASTEXITCODE;
+    return "> ";
+}
+
 Set-Alias vi         $VimPath;
 Set-Alias vim        $VimPath;
 Set-Alias dcraw      $DcrawPath;
@@ -26,22 +43,6 @@ Set-Alias whois      $whoisPath;
 Set-Alias logstalgia $logstalgiaPath;
 Set-Alias sublime    $SublimePath;
 Set-Alias ll         Get-ChildItemColor -Option AllScope;
-
-# for AutoLoading script modules
-Get-Module -ListAvailable | ? { $_.ModuleType -eq "Script" } | Import-Module;
-
-# for AutoLoading Microsoft modules
-if ([Environment]::Is64BitProcess) {
-  Get-Module -ListAvailable | ? { $_.Name.StartsWith("Microsoft.") } | Import-Module;
-}
-
-# for AutoLoading Amido modules
-if ([Environment]::Is64BitProcess) {
-  Get-Module -ListAvailable | ? { $_.Name.StartsWith("Amido.") } | Import-Module;
-}
-
-# for supressing of echo of command line
-$Pscx:Preferences['CD_EchoNewLocation'] = $false;
 
 # for editing your PowerShell profile
 Function Edit-PowershellProfile {
