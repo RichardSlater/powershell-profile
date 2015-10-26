@@ -147,3 +147,7 @@ Function Initialize-Ruby() {
 Set-StrictMode -Version Latest;
 $Global:DebugPreference = "SilentlyContinue";
 $Global:VerbosePreference = "SilentlyContinue";
+
+if (Test-Path ~\Dropbox\PowerShell\Azure\Import-AzureModule.ps1) {
+  . ~\Dropbox\PowerShell\Azure\Import-AzureModule.ps1
+}
