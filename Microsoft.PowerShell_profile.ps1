@@ -18,20 +18,20 @@ $logstalgiaPath = Join-Path $ScriptPath "logstalgia\logstalgia.exe";
 . $($ProfilePath + '\scripts\Get-ChildItemColor.ps1'); # Command Wrapper used by ll
 
 function global:prompt {
-    $realLASTEXITCODE = $LASTEXITCODE
+  $realLASTEXITCODE = $LASTEXITCODE
 
-    if (Test-Path variable:/PSDebugContext) {
-        Write-Host '[DBG] ' -ForegroundColor Red -NoNewLine;
-    } else {
-        Write-Host '[PS] ' -ForegroundColor White -NoNewLine;
-    } 
+  if (Test-Path variable:/PSDebugContext) {
+    Write-Host '[DBG] ' -ForegroundColor Red -NoNewLine;
+  } else {
+    Write-Host '[PS] ' -ForegroundColor White -NoNewLine;
+  } 
 
-    Write-Host (Split-Path -Resolve $pwd -Leaf) -NoNewLine -ForegroundColor Cyan;
+  Write-Host (Split-Path -Resolve $pwd -Leaf) -NoNewLine -ForegroundColor Cyan;
 
-    Write-VcsStatus;
+  Write-VcsStatus;
 
-    $global:LASTEXITCODE = $realLASTEXITCODE;
-    return "> ";
+  $global:LASTEXITCODE = $realLASTEXITCODE;
+  return "> ";
 }
 
 Set-Alias vi         $VimPath;
