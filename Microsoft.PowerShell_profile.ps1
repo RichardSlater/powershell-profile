@@ -108,8 +108,12 @@ Function Visualize-Git {
 Function Goto-Source {
   $source = "C:\Source";
   if (Test-Path $source) {
-    cd $source;
+    Push-Location $source;
   }
+}
+
+Function Goto-Profile {
+  Split-Path $PROFILE | Push-Location;
 }
 
 # for finding files, UNIX like
