@@ -151,3 +151,7 @@ $Global:VerbosePreference = "SilentlyContinue";
 if (Test-Path ~\Dropbox\PowerShell\Azure\Import-AzureModule.ps1) {
   . ~\Dropbox\PowerShell\Azure\Import-AzureModule.ps1
 }
+
+if (Test-Path ~\MachineModules.ps1) {
+  . ~\MachineModules.ps1;
+}
