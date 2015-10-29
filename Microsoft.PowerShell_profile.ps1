@@ -26,9 +26,16 @@ function global:prompt {
     Write-Host '[PS] ' -ForegroundColor White -NoNewLine;
   } 
 
-  Write-Host (Split-Path -Resolve $pwd -Leaf) -NoNewLine -ForegroundColor Cyan;
+  Write-Host "$([Net.Dns]::GetHostName()) " -ForegroundColor Green -NoNewLine
+
+  if ($PWD.Path -eq $HOME) {
+    Write-Host '~' -NoNewLine -ForegroundColor Cyan;
+  } else {
+    Write-Host (Split-Path -Resolve $pwd -Leaf) -NoNewLine -ForegroundColor Cyan;
+  }
 
   Write-VcsStatus;
+
 
   $global:LASTEXITCODE = $realLASTEXITCODE;
   return "> ";
