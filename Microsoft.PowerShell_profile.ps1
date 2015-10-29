@@ -105,15 +105,19 @@ Function Visualize-Git {
   git log --oneline --decorate --all --graph --simplify-by-decoration;
 }
 
-Function Goto-Source {
+Function Push-SourceDirectory {
   $source = "C:\Source";
   if (Test-Path $source) {
     Push-Location $source;
   }
 }
 
-Function Goto-Profile {
+Function Push-ProfileDirectory {
   Split-Path $PROFILE | Push-Location;
+}
+
+Function Set-Hosts {
+  vi $ENV:windir\System32\drivers\etc\hosts;
 }
 
 # for finding files, UNIX like
