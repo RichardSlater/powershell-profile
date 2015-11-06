@@ -1,3 +1,4 @@
+$stopwatch      = [System.Diagnostics.Stopwatch]::StartNew();
 $ProfilePath    = Split-Path $PROFILE;
 $ScriptPath     = Join-Path $ProfilePath bin;
 $VimPath        = Join-Path $ScriptPath "\vim\vim.exe";
@@ -24,7 +25,7 @@ function global:prompt {
     Write-Host '[DBG] ' -ForegroundColor Red -NoNewLine;
   } else {
     Write-Host '[PS] ' -ForegroundColor White -NoNewLine;
-  } 
+  }
 
   Write-Host "$([Net.Dns]::GetHostName()) " -ForegroundColor Green -NoNewLine
 
@@ -35,7 +36,6 @@ function global:prompt {
   }
 
   Write-VcsStatus;
-
 
   $global:LASTEXITCODE = $realLASTEXITCODE;
   return "> ";
@@ -133,7 +133,7 @@ Function New-File($file) {
       $_.LastAccessTime = $date;
       $_.LastWriteTime = $date;
     }
-  } else { 
+  } else {
     [String]::Empty | Out-File $file -Encoding ASCII;
   }
 }
@@ -170,3 +170,18 @@ if (Test-Path ~\Dropbox\PowerShell\Azure\Import-AzureModule.ps1) {
 if (Test-Path ~\MachineModules.ps1) {
   . ~\MachineModules.ps1;
 }
+
+if (Get-Command chef -CommandType Application -ErrorAction "SilentlyContinue") {
+  chef shell-init powershell | Invoke-Expression;
+}
+
+Write-Host "Windows PowerShell Console`n--------------------------`n" -ForegroundColor Green;
+Write-Host "Windows: `t" -ForegroundColor White -NoNewLine;
+Write-Host ([System.Environment]::OSVersion.Version).ToString();
+Write-Host "PowerShell: `t" -ForegroundColor White -NoNewLine;
+Write-Host (Get-Host).Version.ToString();
+Write-Host "Node: `t`t" -ForegroundColor White -NoNewLine;
+& node --version;
+$stopwatch.Stop();
+$timingColor = if ($stopwatch.Elapsed.Seconds -lt 5) { "Green" } elseif ($stopwatch.Elapsed.Seconds -lt 10) { "Yellow" } else { "Red" }
+Write-Host "`nProfile loaded in $($stopwatch.Elapsed.Seconds) seconds and $($stopwatch.Elapsed.Milliseconds) milliseconds.`n" -ForegroundColor $timingColor;
