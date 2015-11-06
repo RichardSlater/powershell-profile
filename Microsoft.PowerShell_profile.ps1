@@ -19,14 +19,14 @@ $wrjpgcomPath   = Join-Path $CJpegRootPath "wrjpgcom\Release\wrjpgcom.exe";
 $whoisPath      = Join-Path $ScriptPath "sysinternals\whois.exe";
 $logstalgiaPath = Join-Path $ScriptPath "logstalgia\logstalgia.exe";
 
-. $($ProfilePath + '\Modules\posh-git\profile.example.ps1'); # Posh-Git
+. $($ProfilePath + '\Modules\posh-git\profile.example.ps1'); # PosPush-Profi  -Git
 
-$ExternalScriptsTable = @{};
+$ProfileTimings = @{};
 Get-ChildItem "$ProfilePath\scripts" | ForEach-Object {
   $sw = [System.Diagnostics.Stopwatch]::StartNew();
   . $_.FullName
   $sw.Stop();
-  $ExternalScriptsTable.Add($_.Name, $sw.Elapsed);
+  $ProfileTimings.Add($_.Name, $sw.Elapsed);
 };
 
 $global:WindowsIdentity = [System.Security.Principal.WindowsIdentity]::GetCurrent();
