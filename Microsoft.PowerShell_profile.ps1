@@ -23,7 +23,7 @@ $logstalgiaPath = Join-Path $ScriptPath "logstalgia\logstalgia.exe";
 
 $ProfileTimings = @{};
 
-$codeFiles = Get-ChildItem -Path "C:\Users\RichardSlater\Documents\WindowsPowerShell\code" -Filter "*.cs";
+$codeFiles = Get-ChildItem -Path "$ProfilePath\code" -Filter "*.cs";
 foreach ($code in $codeFiles) {
   $dependenciesPath = Join-Path -Path $code.Directory -ChildPath $code.BaseName;
   $dependencies = Get-ChildItem -Path (Join-Path $code.Directory  $code.BaseName) -Filter *.dll;
