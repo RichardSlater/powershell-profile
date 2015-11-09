@@ -4,6 +4,7 @@ function Get-ContentColor ([string]$ScriptPath) {
   $colorizer = New-Object ColorCode.CodeColorizer;
   $colorFormatter = New-Object RichardSlater.AnsiFormatter;
   $colorStylesheet = New-Object ColorCode.Styling.StyleSheets.DefaultStyleSheet;
+  $language = [ColorCode.Languages]::PowerShell;
 
   Invoke-Expression ("Get-Content $ScriptPath") | ForEach-Object {
     if ($breakpointLines -Contains $_.ReadCount) {
@@ -19,18 +20,18 @@ function Get-ContentColor ([string]$ScriptPath) {
     $colorWriter = New-Object System.IO.StringWriter($colorized);
 
     if ($_.Length -lt ($Host.UI.RawUI.WindowSize.Width - 9)) {
-      $colorizer.Colorize($_, [ColorCode.Languages]::PowerShell, $colorFormatter, $colorStylesheet, $colorWriter);
+      $colorizer.Colorize($_, $language, $colorFormatter, $colorStylesheet, $colorWriter);
       if ($bg -eq "Red") {
-        Write-Host $colorized.ToString().Replace(';40m', ';5;41m') -BackgroundColor $bg;
+        Write-Host $colorized.ToString().Replace('[1;31;40m', '[1;5;41m').Replace(';40m', ';5;41m') -BackgroundColor $bg;
         Write-Host -NoNewLine "$([char]27)[0m";
       } else {
         Write-Host $colorized.ToString();
       }
     }
     else {
-      $colorizer.Colorize($_.Substring(0, $Host.UI.RawUI.WindowSize.Width - 9), [ColorCode.Languages]::PowerShell, $colorFormatter, $colorStylesheet, $colorWriter);
+      $colorizer.Colorize($_.Substring(0, $Host.UI.RawUI.WindowSize.Width - 9), $language, $colorFormatter, $colorStylesheet, $colorWriter);
       if ($bg -eq "Red") {
-        Write-Host $colorized.ToString().Replace(';40m', ';5;41m') -BackgroundColor $bg -NoNewLine;
+        Write-Host $colorized.ToString().Replace('[1;31;40m', '[1;5;41m').Replace(';40m', ';5;41m') -BackgroundColor $bg -NoNewLine;
         Write-Host -NoNewLine "$([char]27)[0m";
       } else {
         Write-Host $colorized.ToString() -NoNewLine;
