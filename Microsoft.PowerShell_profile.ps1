@@ -19,9 +19,30 @@ $wrjpgcomPath   = Join-Path $CJpegRootPath "wrjpgcom\Release\wrjpgcom.exe";
 $whoisPath      = Join-Path $ScriptPath "sysinternals\whois.exe";
 $logstalgiaPath = Join-Path $ScriptPath "logstalgia\logstalgia.exe";
 
-. $($ProfilePath + '\Modules\posh-git\profile.example.ps1'); # PosPush-Profi  -Git
+. $($ProfilePath + '\Modules\posh-git\profile.example.ps1');
 
 $ProfileTimings = @{};
+
+$codeFiles = Get-ChildItem -Path "C:\Users\RichardSlater\Documents\WindowsPowerShell\code" -Filter "*.cs";
+foreach ($code in $codeFiles) {
+  $dependenciesPath = Join-Path -Path $code.Directory -ChildPath $code.BaseName;
+  $dependencies = Get-ChildItem -Path (Join-Path $code.Directory  $code.BaseName) -Filter *.dll;
+
+  try {
+    $dependencies | ForEach-Object { Add-Type -Path $_.FullName };
+    Add-Type -LiteralPath $code.FullName -ReferencedAssemblies $dependencies.FullName;
+  }
+  catch
+  {
+    if ($_.Exception.GetType() -eq "ReflectionTypeLoadException")
+    {
+      $typeLoadException = $_.Exception;
+      $loaderExceptions  = typeLoadException.LoaderExceptions;
+      $loaderExceptions | Write-Host;
+    }
+  }
+}
+
 Get-ChildItem "$ProfilePath\scripts" | ForEach-Object {
   $sw = [System.Diagnostics.Stopwatch]::StartNew();
   . $_.FullName
@@ -67,6 +88,7 @@ Set-Alias whois      $whoisPath;
 Set-Alias logstalgia $logstalgiaPath;
 Set-Alias sublime    $SublimePath;
 Set-Alias ll         Get-ChildItemColor -Option AllScope;
+Set-Alias cat        Get-ContentColor -Option AllScope;
 
 if (Test-Path ~\Dropbox\PowerShell\Azure\Import-AzureModule.ps1) {
   . ~\Dropbox\PowerShell\Azure\Import-AzureModule.ps1
