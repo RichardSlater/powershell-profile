@@ -109,9 +109,8 @@ Write-Host "PowerShell: `t" -ForegroundColor White -NoNewLine;
 Write-Host (Get-Host).Version.ToString();
 Write-Host "Node: `t`t" -ForegroundColor White -NoNewLine;
 & node --version;
+Write-Host "Ruby: `t`t" -ForegroundColor White -NoNewLine;
+(& ruby --version).Split(' ')[1];
 $stopwatch.Stop();
 $timingColor = if ($stopwatch.Elapsed.Seconds -lt 5) { "Green" } elseif ($stopwatch.Elapsed.Seconds -lt 10) { "Yellow" } else { "Red" }
 Write-Host "`nProfile loaded in $($stopwatch.Elapsed.Seconds) seconds and $($stopwatch.Elapsed.Milliseconds) milliseconds.`n" -ForegroundColor $timingColor;
-# Load Jump-Location profile
-Import-Module 'C:\Users\richa\Documents\WindowsPowerShell\Modules\Jump.Location\Jump.Location.psd1'
-
