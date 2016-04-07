@@ -20,7 +20,7 @@ Function Set-AmidoGitConfiguration {
 
   $sshKey = ssh-add -L | Select-String "richard.slater@amido.co.uk";
   if (!$sshKey) {
-    $sshKeyFile = Join-Path $env:USERPROFILE "Dropbox\SSH\richard.slater@amido.co.uk-2013_rsa";
+    $sshKeyFile = Join-Path $env:USERPROFILE "Dropbox (Personal)\SSH\richard.slater@amido.co.uk-2013_rsa";
     ssh-add $sshKeyFile;
   }
 }
@@ -32,7 +32,7 @@ Function Set-PersonalGitConfiguration {
 
   $sshKey = ssh-add -L | Select-String "github@richard-slater.co.uk";
   if (!$sshKey) {
-    $sshKeyFile = Join-Path $env:USERPROFILE "Dropbox\SSH\github@richard-slater.co.uk-2011_rsa";
+    $sshKeyFile = Join-Path $env:USERPROFILE "Dropbox (Personal)\SSH\github@richard-slater.co.uk-2011_rsa";
     ssh-add $sshKeyFile;
   }
 }
