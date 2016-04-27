@@ -11,6 +11,7 @@ Function Set-GitCore {
   git config --global diff.tool.bc4;
   git config --global difftool.bc4.path $BeyondCompPath;
   git config --global branch.autosetupmerge true;
+  git config --global push.default simple;
 }
 
 # for configuring git at Amido with suitable settings
@@ -20,7 +21,7 @@ Function Set-AmidoGitConfiguration {
 
   $sshKey = ssh-add -L | Select-String "richard.slater@amido.co.uk";
   if (!$sshKey) {
-    $sshKeyFile = Join-Path $env:USERPROFILE "Dropbox (Personal)\SSH\richard.slater@amido.co.uk-2013_rsa";
+    $sshKeyFile = Join-Path $env:USERPROFILE "Dropbox (Personal)\SSH\richard.slater@amido.com-2016";
     ssh-add $sshKeyFile;
   }
 }
@@ -32,7 +33,7 @@ Function Set-PersonalGitConfiguration {
 
   $sshKey = ssh-add -L | Select-String "github@richard-slater.co.uk";
   if (!$sshKey) {
-    $sshKeyFile = Join-Path $env:USERPROFILE "Dropbox (Personal)\SSH\github@richard-slater.co.uk-2011_rsa";
+    $sshKeyFile = Join-Path $env:USERPROFILE "Dropbox (Personal)\SSH\richard@richard-slater.co.uk-2016";
     ssh-add $sshKeyFile;
   }
 }
