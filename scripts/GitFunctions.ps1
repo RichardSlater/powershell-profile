@@ -19,7 +19,7 @@ Function Set-AmidoGitConfiguration {
   git config --global user.email richard.slater@amido.com;
   Set-GitCore;
 
-  $sshKey = ssh-add -L | Select-String "richard.slater@amido.co.uk";
+  $sshKey = ssh-add -L | Select-String "richard.slater@amido.com";
   if (!$sshKey) {
     $sshKeyFile = Join-Path $env:USERPROFILE "Dropbox (Personal)\SSH\richard.slater@amido.com-2016";
     ssh-add $sshKeyFile;
@@ -28,7 +28,7 @@ Function Set-AmidoGitConfiguration {
 
 # for configuring git at home with suitable settings
 Function Set-PersonalGitConfiguration {
-  git config --global user.email git@richard-slater.co.uk;
+  git config --global user.email github@richard-slater.co.uk;
   Set-GitCore;
 
   $sshKey = ssh-add -L | Select-String "github@richard-slater.co.uk";
