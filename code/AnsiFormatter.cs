@@ -63,13 +63,7 @@ namespace RichardSlater {
 			});
 		}
 
-		public void WriteFooter(IStyleSheet styleSheet,
-
-							 TextWriter textWriter) {
-		}
-
-		public void WriteHeader(IStyleSheet styleSheet,
-								TextWriter textWriter) {
-		}
+		public void WriteFooter(IStyleSheet styleSheet, TextWriter textWriter) {}
+		public void WriteHeader(IStyleSheet styleSheet, TextWriter textWriter) {}
 	}
 }

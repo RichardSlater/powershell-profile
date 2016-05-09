@@ -1,6 +1,6 @@
 # for initilizing the Visual Studio command prompt environment
 Function Initialize-VSEnvironment() {
-  Push-Location "C:\Program Files (x86)\Microsoft Visual Studio 12.0\vc";
+  Push-Location "C:\Program Files (x86)\Microsoft Visual Studio 14.0\vc";
   cmd /c "vcvarsall.bat & set" |
   foreach {
     if ($_ -match "=") {
@@ -8,5 +8,5 @@ Function Initialize-VSEnvironment() {
     }
   }
   Pop-Location;
-  Write-Host "`nVisual Studio 2013 Command Prompt variables set." -ForegroundColor Green;
+  Write-Host "`nVisual Studio 2015 Command Prompt variables set." -ForegroundColor Green;
 }

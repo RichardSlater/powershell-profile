@@ -12,16 +12,12 @@ Import-Module .\posh-git
 function global:prompt {
     $realLASTEXITCODE = $LASTEXITCODE
 
-    if (Test-Path variable:/PSDebugContext) {
-        Write-Host '[DBG] ' -ForegroundColor Red;
-    } 
+    Write-Host($pwd.ProviderPath) -nonewline
 
-    Write-Host (Split-Path -Resolve $pwd -Leaf) -NoNewLine -ForegroundColor Cyan;
+    Write-VcsStatus
 
-    Write-VcsStatus;
-
-    $global:LASTEXITCODE = $realLASTEXITCODE;
-    return "> ";
+    $global:LASTEXITCODE = $realLASTEXITCODE
+    return "> "
 }
 
 Pop-Location
