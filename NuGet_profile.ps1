@@ -1,9 +1,14 @@
-function Set-ProjectPreferences {
+Afunction Set-ProjectPreferences {
     Get-Project -all | %{ $_.Properties | ?{ $_.Name -eq "WebApplication.StartWebServerOnDebug" } | %{ $_.Value = "False"} };
     Write-Host "'Always Start When Debugging' has been disabled for all web projects.";
 }
 
-# http://stackoverflow.com/questions/13085480/restoring-nuget-references
 function Repair-ProjectPackages {
-    Get-Project -All | Get-Package | Sort-Object -Unique Id, Version | Update-Package -Reinstall;
+  Update-Package -Reinstall;
+}
+
+function Update-ProjectFramework ($Version = '4.6.1') {
+  Get-Project -All | Where-Object { $_.Type -Ne "Unknown" } | ForEach-Object {
+    $_.Properties["TargetFrameworkMoniker"].Value = ".NETFramework,Version=v$Version";
+  }
 }

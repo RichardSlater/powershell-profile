@@ -12,6 +12,7 @@ Function Set-GitCore {
   git config --global difftool.bc4.path $BeyondCompPath;
   git config --global branch.autosetupmerge true;
   git config --global push.default simple;
+  git config --global pull.rebase true;
 }
 
 # for configuring git at Amido with suitable settings
