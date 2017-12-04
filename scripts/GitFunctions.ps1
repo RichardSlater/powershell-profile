@@ -28,6 +28,18 @@ Function Set-AmidoGitConfiguration {
 }
 
 # for configuring git at home with suitable settings
+Function Set-HMCTSGitConfiguration {
+  git config --global user.email richard.slater@hmcts.net;
+  Set-GitCore;
+
+  $sshKey = ssh-add -L | Select-String "richard.slater@hmcts.net";
+  if (!$sshKey) {
+    $sshKeyFile = Join-Path $env:USERPROFILE "Dropbox (Personal)\SSH\richard.slater@hmcts.net-2018.rsa";
+    ssh-add $sshKeyFile;
+  }
+}
+
+# for configuring git at home with suitable settings
 Function Set-PersonalGitConfiguration {
   git config --global user.email github@richard-slater.co.uk;
   Set-GitCore;
