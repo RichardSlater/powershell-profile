@@ -108,9 +108,13 @@ Write-Host ([System.Environment]::OSVersion.Version).ToString();
 Write-Host "PowerShell: `t" -ForegroundColor White -NoNewLine;
 Write-Host (Get-Host).Version.ToString();
 Write-Host "Node: `t`t" -ForegroundColor White -NoNewLine;
-& node --version;
+(& node --version).Substring(1);
 Write-Host "Ruby: `t`t" -ForegroundColor White -NoNewLine;
 (& ruby --version).Split(' ')[1];
+Write-Host "Go: `t`t" -ForegroundColor White -NoNewLine;
+(& go version).split(' ')[2].Substring(2);
+Write-Host "Terraform: `t" -ForegroundColor White -NoNewLine;
+(& terraform --version).Split(' ')[1].Substring(1);
 $stopwatch.Stop();
 $timingColor = if ($stopwatch.Elapsed.Seconds -lt 5) { "Green" } elseif ($stopwatch.Elapsed.Seconds -lt 10) { "Yellow" } else { "Red" }
 Write-Host "`nProfile loaded in $($stopwatch.Elapsed.Seconds) seconds and $($stopwatch.Elapsed.Milliseconds) milliseconds.`n" -ForegroundColor $timingColor;
