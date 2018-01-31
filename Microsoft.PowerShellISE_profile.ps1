@@ -13,7 +13,6 @@ $wrjpgcomPath   = Join-Path $CJpegRootPath "wrjpgcom\Release\wrjpgcom.exe";
 $whoisPath      = Join-Path $ScriptPath "sysinternals\whois.exe";
 $logstalgiaPath = Join-Path $ScriptPath "logstalgia\logstalgia.exe";
 
-. $($ProfilePath + '\Modules\posh-git\profile.example.ps1'); # Posh-Git
 . $($ProfilePath + '\scripts\Get-ChildItemColor.ps1'); # Command Wrapper used by ll
 
 Set-Alias vi         $VimPath;
@@ -114,7 +113,7 @@ Function New-File($file) {
       $_.LastAccessTime = $date;
       $_.LastWriteTime = $date;
     }
-  } else { 
+  } else {
     [String]::Empty | Out-File $file -Encoding ASCII;
   }
 }

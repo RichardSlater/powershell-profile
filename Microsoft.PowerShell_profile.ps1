@@ -19,8 +19,6 @@ $wrjpgcomPath   = Join-Path $CJpegRootPath "wrjpgcom\Release\wrjpgcom.exe";
 $whoisPath      = Join-Path $ScriptPath "sysinternals\whois.exe";
 $logstalgiaPath = Join-Path $ScriptPath "logstalgia\logstalgia.exe";
 
-. $($ProfilePath + '\Modules\posh-git\profile.example.ps1');
-
 $ProfileTimings = @{};
 
 $codeFiles = Get-ChildItem -Path "$ProfilePath\code" -Filter "*.cs";
@@ -43,7 +41,7 @@ foreach ($code in $codeFiles) {
   }
 }
 
-Get-ChildItem "$ProfilePath\scripts" | ForEach-Object {
+Get-ChildItem "$ProfilePath\scripts" -Filter *.ps1 | ForEach-Object {
   $sw = [System.Diagnostics.Stopwatch]::StartNew();
   . $_.FullName
   $sw.Stop();
@@ -89,10 +87,6 @@ Set-Alias logstalgia $logstalgiaPath;
 Set-Alias sublime    $SublimePath;
 Set-Alias ll         Get-ChildItemColor -Option AllScope;
 Set-Alias cat        Get-ContentColor -Option AllScope;
-
-if (Test-Path ~\Dropbox\PowerShell\Azure\Import-AzureModule.ps1) {
-  . ~\Dropbox\PowerShell\Azure\Import-AzureModule.ps1
-}
 
 if (Test-Path ~\MachineModules.ps1) {
   . ~\MachineModules.ps1;
