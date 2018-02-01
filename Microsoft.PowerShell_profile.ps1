@@ -109,6 +109,10 @@ Write-Host "Go: `t`t" -ForegroundColor White -NoNewLine;
 (& go version).split(' ')[2].Substring(2);
 Write-Host "Terraform: `t" -ForegroundColor White -NoNewLine;
 (& terraform --version).Split(' ')[1].Substring(1);
+Write-Host "Vagrant: `t" -ForegroundColor White -NoNewLine;
+(& vagrant --version).Split(' ')[1];
+Write-Host "Packer: `t" -ForegroundColor White -NoNewLine;
+(& packer --version);
 $stopwatch.Stop();
 $timingColor = if ($stopwatch.Elapsed.Seconds -lt 5) { "Green" } elseif ($stopwatch.Elapsed.Seconds -lt 10) { "Yellow" } else { "Red" }
 Write-Host "`nProfile loaded in $($stopwatch.Elapsed.Seconds) seconds and $($stopwatch.Elapsed.Milliseconds) milliseconds.`n" -ForegroundColor $timingColor;
