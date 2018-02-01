@@ -1,5 +1,6 @@
 # for configururing Git
 Function Set-GitCore {
+  $env:SSH_AUTH_SOCK = $null;
   $gitIgnorePath = Join-Path $ProfilePath .gitignore;
   git config --global user.name "Richard Slater";
   git config --global core.editor vim;
