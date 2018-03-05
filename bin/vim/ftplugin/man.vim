@@ -1,7 +1,7 @@
 " Vim filetype plugin file
 " Language:	man
 " Maintainer:	SungHyun Nam <goweol@gmail.com>
-" Last Change:	2013 Jul 17
+" Last Change: 	2018 Jan 15
 
 " To make the ":Man" command available before editing a manual page, source
 " this script from your startup vimrc file.
@@ -15,12 +15,6 @@ if &filetype == "man"
   endif
   let b:did_ftplugin = 1
 
-  " Ensure Vim is not recursively invoked (man-db does this)
-  " when doing ctrl-[ on a man page reference.
-  if exists("$MANPAGER")
-    let $MANPAGER = ""
-  endif
-
   " allow dot and dash in manual page name.
   setlocal iskeyword+=\.,-
 
@@ -33,6 +27,11 @@ if &filetype == "man"
 
     nnoremap <buffer> <c-]> :call <SID>PreGetPage(v:count)<CR>
     nnoremap <buffer> <c-t> :call <SID>PopPage()<CR>
+    nnoremap <buffer> <silent> q :q<CR>
+  endif
+
+  if exists('g:ft_man_folding_enable') && (g:ft_man_folding_enable == 1)
+    setlocal foldmethod=indent foldnestmax=1 foldenable
   endif
 
   let b:undo_ftplugin = "setlocal iskeyword<"
@@ -40,8 +39,9 @@ if &filetype == "man"
 endif
 
 if exists(":Man") != 2
-  com -nargs=+ Man call s:GetPage(<f-args>)
+  com -nargs=+ -complete=shellcmd Man call s:GetPage(<f-args>)
   nmap <Leader>K :call <SID>PreGetPage(0)<CR>
+  nmap <Plug>ManPreGetPage :call <SID>PreGetPage(0)<CR>
 endif
 
 " Define functions only once.
@@ -63,7 +63,9 @@ endtry
 func <SID>PreGetPage(cnt)
   if a:cnt == 0
     let old_isk = &iskeyword
-    setl iskeyword+=(,)
+    if &ft == 'man'
+      setl iskeyword+=(,)
+    endif
     let str = expand("<cword>")
     let &l:iskeyword = old_isk
     let page = substitute(str, '(*\(\k\+\).*', '\1', '')
@@ -89,7 +91,7 @@ func <SID>GetCmdArg(sect, page)
 endfunc
 
 func <SID>FindPage(sect, page)
-  let where = system("/usr/bin/man ".s:man_find_arg.' '.s:GetCmdArg(a:sect, a:page))
+  let where = system("man ".s:man_find_arg.' '.s:GetCmdArg(a:sect, a:page))
   if where !~ "^/"
     if matchstr(where, " [^ ]*$") !~ "^ /"
       return 0
@@ -143,7 +145,17 @@ func <SID>GetPage(...)
       endwhile
     endif
     if &filetype != "man"
-      new
+      if exists("g:ft_man_open_mode")
+        if g:ft_man_open_mode == "vert"
+          vnew
+        elseif g:ft_man_open_mode == "tab"
+          tabnew
+        else
+          new
+        endif
+      else
+        new
+      endif
       setl nonu fdc=0
     endif
   endif
@@ -153,19 +165,39 @@ func <SID>GetPage(...)
 
   setl ma nonu nornu nofen
   silent exec "norm 1GdG"
-  let $MANWIDTH = winwidth(0)
-  silent exec "r!/usr/bin/man ".s:GetCmdArg(sect, page)." | col -b"
+  let unsetwidth = 0
+  if empty($MANWIDTH)
+    let $MANWIDTH = winwidth(0)
+    let unsetwidth = 1
+  endif
+
+  " Ensure Vim is not recursively invoked (man-db does this) when doing ctrl-[
+  " on a man page reference by unsetting MANPAGER.
+  " Some versions of env(1) do not support the '-u' option, and in such case
+  " we set MANPAGER=cat.
+  if !exists('s:env_has_u')
+    call system('env -u x true')
+    let s:env_has_u = (v:shell_error == 0)
+  endif
+  let env_cmd = s:env_has_u ? 'env -u MANPAGER' : 'env MANPAGER=cat'
+  let man_cmd = env_cmd . ' man ' . s:GetCmdArg(sect, page) . ' | col -b'
+  silent exec "r !" . man_cmd
+
+  if unsetwidth
+    let $MANWIDTH = ''
+  endif
   " Remove blank lines from top and bottom.
   while getline(1) =~ '^\s*$'
-    silent norm ggdd
+    silent keepj norm ggdd
   endwhile
   while getline('$') =~ '^\s*$'
-    silent norm Gdd
+    silent keepj norm Gdd
   endwhile
   1
   setl ft=man nomod
   setl bufhidden=hide
   setl nobuflisted
+  setl noma
 endfunc
 
 func <SID>PopPage()
@@ -186,4 +218,4 @@ endfunc
 
 endif
 
-" vim: set sw=2:
+" vim: set sw=2 ts=8 noet:

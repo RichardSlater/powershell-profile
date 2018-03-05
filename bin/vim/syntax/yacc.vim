@@ -1,18 +1,15 @@
 " Vim syntax file
 " Language:	Yacc
 " Maintainer:	Charles E. Campbell <NdrOchipS@PcampbellAfamily.Mbiz>
-" Last Change:	Nov 14, 2012
-" Version:	10
-" URL:	http://mysite.verizon.net/astronaut/vim/index.html#vimlinks_syntax
+" Last Change:	Aug 31, 2016
+" Version:	15
+" URL:	http://www.drchip.org/astronaut/vim/index.html#SYNTAX_YACC
 "
 " Options: {{{1
 "   g:yacc_uses_cpp : if this variable exists, then C++ is loaded rather than C
 
 " ---------------------------------------------------------------------
 " this version of syntax/yacc.vim requires 6.0 or later
-if version < 600
- finish
-endif
 if exists("b:current_syntax")
  syntax clear
 endif
@@ -42,7 +39,7 @@ exe "syn include @yaccCode ".s:Cpath
 " ---------------------------------------------------------------------
 "  Yacc Clusters: {{{1
 syn cluster yaccInitCluster	contains=yaccKey,yaccKeyActn,yaccBrkt,yaccType,yaccString,yaccUnionStart,yaccHeader2,yaccComment,yaccDefines,yaccParseParam,yaccParseOption
-syn cluster yaccRulesCluster	contains=yaccNonterminal,yaccString
+syn cluster yaccRulesCluster	contains=yaccNonterminal,yaccString,yaccComment
 
 " ---------------------------------------------------------------------
 "  Yacc Sections: {{{1
@@ -90,7 +87,7 @@ syn sync fromstart
 
 " ---------------------------------------------------------------------
 " Define the default highlighting. {{{1
-if !exists("did_yacc_syn_inits")
+if !exists("skip_yacc_syn_inits")
   hi def link yaccBrkt	yaccStmt
   hi def link yaccComment	Comment
   hi def link yaccCurly	Delimiter

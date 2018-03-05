@@ -1,7 +1,7 @@
 " Vim filetype plugin
 " Language:	Vim
 " Maintainer:	Bram Moolenaar <Bram@vim.org>
-" Last Change:	2013 Jun 26
+" Last Change:	2017 Dec 05
 
 " Only do this when not done yet for this buffer
 if exists("b:did_ftplugin")
@@ -25,6 +25,9 @@ setlocal fo-=t fo+=croql
 " keyword character.  E.g., for netrw#Nread().
 setlocal isk+=#
 
+" Use :help to lookup the keyword under the cursor with K.
+setlocal keywordprg=:help
+
 " Set 'comments' to format dashed lists in comments
 setlocal com=sO:\"\ -,mO:\"\ \ ,eO:\"\",:\"
 
@@ -36,21 +39,23 @@ endif
 " Comments start with a double quote
 setlocal commentstring=\"%s
 
-" Move around functions.
-nnoremap <silent><buffer> [[ m':call search('^\s*fu\%[nction]\>', "bW")<CR>
-vnoremap <silent><buffer> [[ m':<C-U>exe "normal! gv"<Bar>call search('^\s*fu\%[nction]\>', "bW")<CR>
-nnoremap <silent><buffer> ]] m':call search('^\s*fu\%[nction]\>', "W")<CR>
-vnoremap <silent><buffer> ]] m':<C-U>exe "normal! gv"<Bar>call search('^\s*fu\%[nction]\>', "W")<CR>
-nnoremap <silent><buffer> [] m':call search('^\s*endf*\%[unction]\>', "bW")<CR>
-vnoremap <silent><buffer> [] m':<C-U>exe "normal! gv"<Bar>call search('^\s*endf*\%[unction]\>', "bW")<CR>
-nnoremap <silent><buffer> ][ m':call search('^\s*endf*\%[unction]\>', "W")<CR>
-vnoremap <silent><buffer> ][ m':<C-U>exe "normal! gv"<Bar>call search('^\s*endf*\%[unction]\>', "W")<CR>
+if !exists("no_plugin_maps") && !exists("no_vim_maps")
+  " Move around functions.
+  nnoremap <silent><buffer> [[ m':call search('^\s*fu\%[nction]\>', "bW")<CR>
+  vnoremap <silent><buffer> [[ m':<C-U>exe "normal! gv"<Bar>call search('^\s*fu\%[nction]\>', "bW")<CR>
+  nnoremap <silent><buffer> ]] m':call search('^\s*fu\%[nction]\>', "W")<CR>
+  vnoremap <silent><buffer> ]] m':<C-U>exe "normal! gv"<Bar>call search('^\s*fu\%[nction]\>', "W")<CR>
+  nnoremap <silent><buffer> [] m':call search('^\s*endf*\%[unction]\>', "bW")<CR>
+  vnoremap <silent><buffer> [] m':<C-U>exe "normal! gv"<Bar>call search('^\s*endf*\%[unction]\>', "bW")<CR>
+  nnoremap <silent><buffer> ][ m':call search('^\s*endf*\%[unction]\>', "W")<CR>
+  vnoremap <silent><buffer> ][ m':<C-U>exe "normal! gv"<Bar>call search('^\s*endf*\%[unction]\>', "W")<CR>
 
-" Move around comments
-nnoremap <silent><buffer> ]" :call search('^\(\s*".*\n\)\@<!\(\s*"\)', "W")<CR>
-vnoremap <silent><buffer> ]" :<C-U>exe "normal! gv"<Bar>call search('^\(\s*".*\n\)\@<!\(\s*"\)', "W")<CR>
-nnoremap <silent><buffer> [" :call search('\%(^\s*".*\n\)\%(^\s*"\)\@!', "bW")<CR>
-vnoremap <silent><buffer> [" :<C-U>exe "normal! gv"<Bar>call search('\%(^\s*".*\n\)\%(^\s*"\)\@!', "bW")<CR>
+  " Move around comments
+  nnoremap <silent><buffer> ]" :call search('^\(\s*".*\n\)\@<!\(\s*"\)', "W")<CR>
+  vnoremap <silent><buffer> ]" :<C-U>exe "normal! gv"<Bar>call search('^\(\s*".*\n\)\@<!\(\s*"\)', "W")<CR>
+  nnoremap <silent><buffer> [" :call search('\%(^\s*".*\n\)\%(^\s*"\)\@!', "bW")<CR>
+  vnoremap <silent><buffer> [" :<C-U>exe "normal! gv"<Bar>call search('\%(^\s*".*\n\)\%(^\s*"\)\@!', "bW")<CR>
+endif
 
 " Let the matchit plugin know what items can be matched.
 if exists("loaded_matchit")
@@ -62,9 +67,12 @@ if exists("loaded_matchit")
 	\ '\<try\>:\<cat\%[ch]\>:\<fina\%[lly]\>:\<endt\%[ry]\>,' .
 	\ '\<aug\%[roup]\s\+\%(END\>\)\@!\S:\<aug\%[roup]\s\+END\>,' .
 	\ '(:)'
-  " Ignore ":syntax region" commands, the 'end' argument clobbers if-endif
-  let b:match_skip = 'getline(".") =~ "^\\s*sy\\%[ntax]\\s\\+region" ||
-	\ synIDattr(synID(line("."),col("."),1),"name") =~? "comment\\|string"'
+  " Ignore syntax region commands and settings, any 'en*' would clobber
+  " if-endif.
+  " - set spl=de,en
+  " - au! FileType javascript syntax region foldBraces start=/{/ end=/}/ …
+  let b:match_skip = 'synIDattr(synID(line("."),col("."),1),"name")
+        \ =~? "comment\\|string\\|vimSynReg\\|vimSet"'
 endif
 
 let &cpo = s:cpo_save

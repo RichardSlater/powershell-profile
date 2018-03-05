@@ -1,7 +1,7 @@
 " Vim tutor support file
 " Author: Eduardo F. Amatria <eferna1@platea.pntic.mec.es>
 " Maintainer: Bram Moolenaar
-" Last Change:	2012 Sep 21
+" Last Change:	2016 Jul 16
 
 " This Vim script is used for detecting if a translation of the
 " tutor file exist, i.e., a tutor.xx file, where xx is the language.
@@ -36,10 +36,14 @@ else
       let s:ext = ".pl"
     elseif s:lang =~ "Slovak"
       let s:ext = ".sk"
+    elseif s:lang =~ "Serbian"
+      let s:ext = ".sr"
     elseif s:lang =~ "Czech"
       let s:ext = ".cs"
     elseif s:lang =~ "Dutch"
       let s:ext = ".nl"
+    elseif s:lang =~ "Bulgarian"
+      let s:ext = ".bg"
     else
       let s:ext = "." . strpart(s:lang, 0, 2)
     endif
@@ -119,6 +123,15 @@ endif
 if s:ext =~? '\.sk'
   if &enc =~ 1250
     let s:ext = ".sk.cp1250"
+  endif
+endif
+
+" The Slovak tutor is available in two encodings, guess which one to use
+" Note that the utf-8 version is the original, the cp1250 version is created
+" from it.
+if s:ext =~? '\.sr'
+  if &enc =~ 1250
+    let s:ext = ".sr.cp1250"
   endif
 endif
 

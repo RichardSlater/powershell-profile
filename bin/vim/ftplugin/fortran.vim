@@ -1,12 +1,12 @@
 " Vim settings file
 " Language:	Fortran 2008 (and older: Fortran 2003, 95, 90, 77, 66)
-" Version:	0.48
-" Last Change:	2012 Apr. 18
-" Maintainer:	Ajit J. Thakkar <ajit@unb.ca>; <http://www.unb.ca/chem/ajit/>
-" Usage:	Do :help fortran-plugin from Vim
+" Version:	0.50
+" Last Change:	2015 Nov. 30
+" Maintainer:	Ajit J. Thakkar <ajit@unb.ca>; <http://www2.unb.ca/~ajit/>
+" Usage:	For instructions, do :help fortran-plugin from Vim
 " Credits:
-" Useful suggestions were made by Stefano Zacchiroli, Hendrik Merx, and Ben
-" Fritz.
+" Useful suggestions were made by Stefano Zacchiroli, Hendrik Merx, Ben
+" Fritz, and David Barnett.
 
 " Only do these settings when not done yet for this buffer
 if exists("b:did_ftplugin")
@@ -20,7 +20,10 @@ set cpoptions&vim
 let b:did_ftplugin = 1
 
 " Determine whether this is a fixed or free format source file
-" if this hasn't been done yet
+" if this hasn't been done yet using the priority:
+" buffer-local value
+" > global value
+" > file extension as in Intel ifort, gcc (gfortran), NAG, Pathscale, and Cray compilers
 if !exists("b:fortran_fixed_source")
   if exists("fortran_free_source")
     " User guarantees free source form
@@ -28,13 +31,19 @@ if !exists("b:fortran_fixed_source")
   elseif exists("fortran_fixed_source")
     " User guarantees fixed source form
     let b:fortran_fixed_source = 1
+  elseif expand("%:e") ==? "f\<90\|95\|03\|08\>"
+    " Free-form file extension defaults as in Intel ifort, gcc(gfortran), NAG, Pathscale, and Cray compilers
+    let b:fortran_fixed_source = 0
+  elseif expand("%:e") ==? "f\|f77\|for"
+    " Fixed-form file extension defaults
+    let b:fortran_fixed_source = 1
   else
-    " Modern Fortran allows both fixed and free source form
-    " assume fixed source form unless signs of free source form
-    " are detected in the first five columns of the first s:lmax lines
+    " Modern fortran still allows both fixed and free source form
+    " Assume fixed source form unless signs of free source form
+    " are detected in the first five columns of the first s:lmax lines.
     " Detection becomes more accurate and time-consuming if more lines
     " are checked. Increase the limit below if you keep lots of comments at
-    " the very top of each file and you have a fast computer
+    " the very top of each file and you have a fast computer.
     let s:lmax = 500
     if ( s:lmax > line("$") )
       let s:lmax = line("$")
@@ -64,8 +73,8 @@ if (b:fortran_fixed_source == 1)
   " setlocal tw=73
 else
   setlocal comments=:!
-  " Free format allows a textwidth of 132 for code but 80 is more usual
-  setlocal tw=80
+  " Free format allows a textwidth of 132
+  setlocal tw=132
 endif
 
 " Set commentstring for foldmethod=marker
@@ -76,8 +85,8 @@ if !exists("fortran_have_tabs")
   setlocal expandtab
 endif
 
-" Set 'formatoptions' to break comment and text lines but allow long lines
-setlocal fo+=tcql
+" Set 'formatoptions' to break text lines
+setlocal fo+=t
 
 setlocal include=^\\c#\\=\\s*include\\s\\+
 setlocal suffixesadd+=.f08,.f03,.f95,.f90,.for,.f,.F,.f77,.ftn,.fpp
@@ -114,7 +123,7 @@ if has("gui_win32") && !exists("b:browsefilter")
     \ "All Files (*.*)\t*.*\n"
 endif
 
-let b:undo_ftplugin = "setl fo< com< tw< cms< et< inc<"
+let b:undo_ftplugin = "setl fo< com< tw< cms< et< inc< sua<"
 	\ . "| unlet! b:match_ignorecase b:match_words b:browsefilter"
 
 let &cpoptions=s:cposet

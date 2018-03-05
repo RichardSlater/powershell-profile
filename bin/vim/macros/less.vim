@@ -1,6 +1,6 @@
 " Vim script to work like "less"
 " Maintainer:	Bram Moolenaar <Bram@vim.org>
-" Last Change:	2012 May 18
+" Last Change:	2017 Mar 31
 
 " Avoid loading this file twice, allow the user to define his own script.
 if exists("loaded_less")
@@ -48,6 +48,12 @@ set nows
 let s:lz = &lz
 set lz
 
+" Allow the user to define a function, which can set options specifically for
+" this script.
+if exists('*LessInitFunc')
+  call LessInitFunc()
+endif
+
 " Used after each command: put cursor at end and display position
 if &wrap
   noremap <SID>L L0:redraw<CR>:file<CR>
@@ -75,6 +81,10 @@ fun! s:Help()
   echo "\n"
   echo "/pattern  Search for pattern        ?pattern  Search backward for pattern"
   echo "n         next pattern match        N         Previous pattern match"
+  if &foldmethod != "manual"
+  echo "\n"
+    echo "zR        open all folds            zm        increase fold level"
+  endif
   echo "\n"
   echo ":n<Enter> Next file                 :p<Enter> Previous file"
   echo "\n"
@@ -87,7 +97,14 @@ noremap <script> <Space> :call <SID>NextPage()<CR><SID>L
 map <C-V> <Space>
 map f <Space>
 map <C-F> <Space>
-map z <Space>
+map <PageDown> <Space>
+map <kPageDown> <Space>
+map <S-Down> <Space>
+" If 'foldmethod' was changed keep the "z" commands, e.g. "zR" to open all
+" folds.
+if &foldmethod == "manual"
+  map z <Space>
+endif
 map <Esc><Space> <Space>
 fun! s:NextPage()
   if line(".") == line("$")
@@ -116,10 +133,14 @@ map e <CR>
 map <C-E> <CR>
 map j <CR>
 map <C-J> <CR>
+map <Down> <CR>
 
 " Scroll one page backward
 noremap <script> b <C-B><SID>L
 map <C-B> b
+map <PageUp> b
+map <kPageUp> b
+map <S-Up> b
 map w b
 map <Esc>v b
 
@@ -133,6 +154,7 @@ map y k
 map <C-Y> k
 map <C-P> k
 map <C-K> k
+map <Up> k
 
 " Redraw
 noremap <script> r <C-L><SID>L
@@ -143,11 +165,15 @@ noremap <script> R <C-L><SID>L
 noremap <script> g gg<SID>L
 map < g
 map <Esc>< g
+map <Home> g
+map <kHome> g
 
 " End of file
 noremap <script> G G<SID>L
 map > G
 map <Esc>> G
+map <End> G
+map <kEnd> G
 
 " Go to percentage
 noremap <script> % %<SID>L
@@ -184,6 +210,7 @@ fun! s:Backward()
 endfun
 
 call s:Forward()
+cunmap <CR>
 
 " Quitting
 noremap q :q<CR>
@@ -240,6 +267,18 @@ fun! s:End()
   unmap v
   unmap /
   unmap ?
+  unmap <Up>
+  unmap <Down>
+  unmap <PageDown>
+  unmap <kPageDown>
+  unmap <PageUp>
+  unmap <kPageUp>
+  unmap <S-Down>
+  unmap <S-Up>
+  unmap <Home>
+  unmap <kHome>
+  unmap <End>
+  unmap <kEnd>
 endfun
 
 " vim: sw=2
