@@ -18,6 +18,7 @@ $rdjpegcomPath  = Join-Path $CJpegRootPath "cjpeg\rdjpgcom\Release\rdjpgcom.exe"
 $wrjpgcomPath   = Join-Path $CJpegRootPath "wrjpgcom\Release\wrjpgcom.exe";
 $whoisPath      = Join-Path $ScriptPath "sysinternals\whois.exe";
 $logstalgiaPath = Join-Path $ScriptPath "logstalgia\logstalgia.exe";
+$terraformPath  = 'C:\Tools\hashicorp\terraform.exe'
 
 $ProfileTimings = @{};
 
@@ -85,6 +86,7 @@ Set-Alias gource     $GourcePath;
 Set-Alias whois      $whoisPath;
 Set-Alias logstalgia $logstalgiaPath;
 Set-Alias sublime    $SublimePath;
+Set-Alias tf         $TerraformPath;
 Set-Alias ll         Get-ChildItemColor -Option AllScope;
 Set-Alias cat        Get-ContentColor -Option AllScope;
 
