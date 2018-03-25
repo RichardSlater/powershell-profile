@@ -1,18 +1,26 @@
-Function Update-Terraform($Version = $null, [switch]$WhatIf) {
-  $updateCheck = Invoke-RestMethod -Uri 'https://checkpoint-api.hashicorp.com/v1/check/terraform'
+function Update-Terraform($Version = $null, [switch]$WhatIf) {
+  Update-Hashicorp -Product "terraform" -Version $Version -WhatIf:$WhatIf
+}
+
+function Update-Packer($Version = $null, [switch]$WhatIf) {
+  Update-Hashicorp -Product "packer" -Version $Version -WhatIf:$WhatIf
+}
+
+Function Update-Hashicorp($Product, $Version = $null, [switch]$WhatIf) {
+  $updateCheck = Invoke-RestMethod -Uri "https://checkpoint-api.hashicorp.com/v1/check/$Product"
   $localDirectory = 'C:\Tools\hashicorp\'
   $latestVersion = $updateCheck.current_version
   $targetVersion = if ($Version) { $version } else { $latestVersion }
-  $activeTerraform = Join-Path $localDirectory 'terraform.exe'
-  $currentVersion = (& $activeTerraform --version).Split(' ')[1].Substring(1)
-  $backupDirectory = Join-Path $localDirectory $currentVersion
-  $backupExecutable = Join-Path $backupDirectory "terraform.exe"
-  $versionDirectory = Join-Path $localDirectory $targetVersion
-  $downloadFile = "terraform_$($targetVersion)_windows_amd64.zip"
-  $downloadUri = "https://releases.hashicorp.com/terraform/$targetVersion/$downloadFile"
+  $activeVersion = Join-Path $localDirectory "$Product.exe"
+  $currentVersion = if ((& $activeVersion --version) -match '\d+\.\d+\.\d+') { $matches[0] } else { "N/A" }
+  $backupDirectory = Join-Path $localDirectory "$($Product)-$currentVersion"
+  $backupExecutable = Join-Path $backupDirectory "$Product.exe"
+  $versionDirectory = Join-Path $localDirectory "$($Product)-$targetVersion"
+  $downloadFile = "$($Product)_$($targetVersion)_windows_amd64.zip"
+  $downloadUri = "https://releases.hashicorp.com/$Product/$targetVersion/$downloadFile"
   $downloadLocation = Join-Path $versionDirectory $downloadFile
 
-  Write-Host 'Terraform Update' -ForegroundColor White
+  Write-Host "$Product update" -ForegroundColor White
   Write-Host
   Write-Host '  Latest: ' -ForegroundColor White -NoNewLine
   Write-Host $latestVersion
@@ -23,8 +31,8 @@ Function Update-Terraform($Version = $null, [switch]$WhatIf) {
   Write-Host
 
   if ($WhatIf) {
-    Write-Host -ForegroundColor Yellow "`[WhatIf`] Download Terraform $targetVersion from $downloadUri"
-    Write-Host -ForegroundColor Yellow "`[WhatIf`] Backup $activeTerraform to $backupDirectory"
+    Write-Host -ForegroundColor Yellow "`[WhatIf`] Download $targetVersion from $downloadUri"
+    Write-Host -ForegroundColor Yellow "`[WhatIf`] Backup $activeVersion to $backupDirectory"
     Write-Host -ForegroundColor Yellow "`[WhatIf`] Extract $downloadLocation to $localDirectory"
     Write-Host -ForegroundColor DarkYellow "Simulation Complete"
     return
@@ -35,6 +43,7 @@ Function Update-Terraform($Version = $null, [switch]$WhatIf) {
     if (-Not (Test-Path $backupDirectory)) { New-Item -Type Container $backupDirectory | Out-Null }
     if (-Not (Test-Path $versionDirectory)) { New-Item -Type Container $versionDirectory | Out-Null }
 
+
     Write-Debug "Download Uri: $downloadUri"
     if (-Not (Test-Path $downloadLocation)) {
       [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
@@ -42,13 +51,13 @@ Function Update-Terraform($Version = $null, [switch]$WhatIf) {
     }
     try {
       if (Test-Path $backupExecutable) {
-        Move-Item $activeTerraform $backupDirectory -Force | Out-Null
+        Move-Item $activeVersion $backupDirectory -Force | Out-Null
       }
       Expand-Archive $downloadLocation -DestinationPath $localDirectory -Force
     } catch {
       if (Test-Path $backupExecutable) {
         Write-Host "Failed... rolling back..." -ForegroundColor Red -NoNewLine
-        Move-Item $backupExecutable $activeTerraform | Out-Null
+        Move-Item $backupExecutable $activeVersion | Out-Null
       } else {
         Write-Host "Failed... no backup to restore... sorry about that!" -ForegroundColor Red
       }
