@@ -12,7 +12,9 @@ Function Update-Hashicorp($Product, $Version = $null, [switch]$WhatIf) {
   $latestVersion = $updateCheck.current_version
   $targetVersion = if ($Version) { $version } else { $latestVersion }
   $activeVersion = Join-Path $localDirectory "$Product.exe"
-  $currentVersion = if ((& $activeVersion --version) -match '\d+\.\d+\.\d+') { $matches[0] } else { "N/A" }
+  $unparsedVersion = $(& $activeVersion --version)
+  $isInstalled = $unparsedVersion[0] -match '\d+\.\d+\.\d+'
+  $currentVersion = if ($isInstalled) { $matches[0] } else { "N/A" }
   $backupDirectory = Join-Path $localDirectory "$($Product)-$currentVersion"
   $backupExecutable = Join-Path $backupDirectory "$Product.exe"
   $versionDirectory = Join-Path $localDirectory "$($Product)-$targetVersion"
@@ -42,7 +44,6 @@ Function Update-Hashicorp($Product, $Version = $null, [switch]$WhatIf) {
     Write-Host "Updating..." -ForegroundColor Yellow -NoNewLine
     if (-Not (Test-Path $backupDirectory)) { New-Item -Type Container $backupDirectory | Out-Null }
     if (-Not (Test-Path $versionDirectory)) { New-Item -Type Container $versionDirectory | Out-Null }
-
 
     Write-Debug "Download Uri: $downloadUri"
     if (-Not (Test-Path $downloadLocation)) {
