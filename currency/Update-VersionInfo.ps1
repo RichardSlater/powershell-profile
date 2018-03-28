@@ -40,4 +40,12 @@ function Format-VersionTable () {
   }
 }
 
-Update-VersionInfo | Format-VersionTable
+$versionCache = "$PSScriptRoot\versionCache.xml"
+$cacheExists = Test-Path ($versionCache)
+$lastWrite = Get-ChildItem $versionCache -ErrorAction SilentlyContinue | Select-Object -ExpandProperty LastWriteTime
+$lastWriteWithinDay = $lastWrite -lt (Get-Date).AddDays(-1)
+if (-Not $cacheExists -And $lastWriteWithinDay) {
+  Update-VersionInfo | Export-CliXml $versionCache
+}
+
+Import-CliXml $versionCache | Format-VersionTable
