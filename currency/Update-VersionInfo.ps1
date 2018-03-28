@@ -1,3 +1,5 @@
+$versionCache = "$PSScriptRoot\versionCache.xml"
+
 function Update-VersionInfo () {
   $providerFiles = Get-ChildItem $PSScriptRoot -Filter 'Provider-*.ps1'
   $providers = $providerFiles | Select-Object @{ Name='Provider'; Expression= { & $_.FullName } }
@@ -40,12 +42,15 @@ function Format-VersionTable () {
   }
 }
 
-$versionCache = "$PSScriptRoot\versionCache.xml"
 $cacheExists = Test-Path ($versionCache)
 $lastWrite = Get-ChildItem $versionCache -ErrorAction SilentlyContinue | Select-Object -ExpandProperty LastWriteTime
 $lastWriteWithinDay = $lastWrite -lt (Get-Date).AddDays(-1)
+$versionData = $null
 if (-Not $cacheExists -And $lastWriteWithinDay) {
-  Update-VersionInfo | Export-CliXml $versionCache
+  $versionData = Update-VersionInfo
+  $versionData | Export-CliXml $versionCache
+} else {
+  $versionData = Import-CliXml $versionCache
 }
 
-Import-CliXml $versionCache | Format-VersionTable
+$versionData | Format-VersionTable

@@ -81,6 +81,9 @@ function global:prompt {
   return "> ";
 }
 
+# Initalise NodeJS so that is executes promptly
+& node --version | Out-Null
+
 Set-Alias vi         $VimPath;
 Set-Alias vim        $VimPath;
 Set-Alias dcraw      $DcrawPath;
