@@ -2,6 +2,9 @@ Set-StrictMode -Version Latest;
 $Global:DebugPreference = "SilentlyContinue";
 $Global:VerbosePreference = "SilentlyContinue";
 
+# Configure ServicePointManager to Prefer TLS 1.2
+[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+
 $stopwatch      = [System.Diagnostics.Stopwatch]::StartNew();
 $ProfilePath    = Split-Path $PROFILE;
 $ScriptPath     = Join-Path $ProfilePath bin;
@@ -99,22 +102,11 @@ if (Get-Command chef -CommandType Application -ErrorAction "SilentlyContinue") {
 }
 
 Write-Host "Windows PowerShell Console`n--------------------------`n" -ForegroundColor Green;
-Write-Host "Windows: `t" -ForegroundColor White -NoNewLine;
+Write-Host "Windows:     " -ForegroundColor White -NoNewLine;
 Write-Host ([System.Environment]::OSVersion.Version).ToString();
-Write-Host "PowerShell: `t" -ForegroundColor White -NoNewLine;
+Write-Host "PowerShell:  " -ForegroundColor White -NoNewLine;
 Write-Host (Get-Host).Version.ToString();
-Write-Host "Node: `t`t" -ForegroundColor White -NoNewLine;
-(& node --version).Substring(1);
-Write-Host "Ruby: `t`t" -ForegroundColor White -NoNewLine;
-(& ruby --version).Split(' ')[1];
-Write-Host "Go: `t`t" -ForegroundColor White -NoNewLine;
-(& go version).split(' ')[2].Substring(2);
-Write-Host "Terraform: `t" -ForegroundColor White -NoNewLine;
-(& terraform --version).Split(' ')[1].Substring(1);
-Write-Host "Vagrant: `t" -ForegroundColor White -NoNewLine;
-(& vagrant --version).Split(' ')[1];
-Write-Host "Packer: `t" -ForegroundColor White -NoNewLine;
-(& packer --version);
+& "$PSScriptRoot\currency\Update-VersionInfo.ps1"
 $stopwatch.Stop();
 $timingColor = if ($stopwatch.Elapsed.Seconds -lt 5) { "Green" } elseif ($stopwatch.Elapsed.Seconds -lt 10) { "Yellow" } else { "Red" }
 Write-Host "`nProfile loaded in $($stopwatch.Elapsed.Seconds) seconds and $($stopwatch.Elapsed.Milliseconds) milliseconds.`n" -ForegroundColor $timingColor;
