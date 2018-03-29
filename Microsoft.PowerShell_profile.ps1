@@ -104,7 +104,8 @@ if (Get-Command chef -CommandType Application -ErrorAction "SilentlyContinue") {
   chef shell-init powershell | Invoke-Expression;
 }
 
-Write-Host "Windows PowerShell Console`n--------------------------`n" -ForegroundColor Green;
+Get-Content $ProfilePath\logo.txt | Write-Host -ForegroundColor DarkYellow
+Write-Host
 Write-Host "Windows:     " -ForegroundColor White -NoNewLine;
 Write-Host ([System.Environment]::OSVersion.Version).ToString();
 Write-Host "PowerShell:  " -ForegroundColor White -NoNewLine;
