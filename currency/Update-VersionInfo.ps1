@@ -42,15 +42,24 @@ function Format-VersionTable () {
   }
 }
 
-$cacheExists = Test-Path ($versionCache)
-$lastWrite = Get-ChildItem $versionCache -ErrorAction SilentlyContinue | Select-Object -ExpandProperty LastWriteTime
-$lastWriteWithinDay = $lastWrite -lt (Get-Date).AddDays(-1)
-$versionData = $null
-if (-Not $cacheExists -And $lastWriteWithinDay) {
+$updateVersionInfo = {
   $versionData = Update-VersionInfo
   $versionData | Export-CliXml $versionCache
+  return $versionData
+}
+
+$versionData = $null
+if (-Not (Test-Path ($versionCache))) {
+  $versionData = & $updateVersionInfo
 } else {
+  $lastWrite = Get-ChildItem $versionCache -ErrorAction SilentlyContinue | Select-Object -ExpandProperty LastWriteTime
+  $needsUpdate = $lastWrite -lt (Get-Date).AddHours(-1)
   $versionData = Import-CliXml $versionCache
+
+  if ($needsUpdate) {
+    Get-Job -Name "Update Version Information" -ErrorAction SilentlyContinue | Remove-Job
+    Start-Job -Name 'Update Version Information' -ScriptBlock $updateVersionInfo | Out-Null
+  }
 }
 
 $versionData | Format-VersionTable
