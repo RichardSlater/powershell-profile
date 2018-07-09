@@ -14,6 +14,7 @@ Function Set-GitCore {
   git config --global branch.autosetupmerge true;
   git config --global push.default simple;
   git config --global pull.rebase true;
+  git config --global user.signingkey A6DA3DB0942B2D021B75F6DA973EC875A6E40B5A;
 }
 
 # for configuring git at Amido with suitable settings
@@ -23,7 +24,7 @@ Function Set-AmidoGitConfiguration {
 
   $sshKey = ssh-add -L | Select-String "richard.slater@amido.com";
   if (!$sshKey) {
-    $sshKeyFile = Join-Path $env:USERPROFILE "Dropbox (Personal)\SSH\richard.slater@amido.com-2016";
+    $sshKeyFile = Join-Path $env:USERPROFILE ".ssh/richard.slater@amido.com-2016";
     ssh-add $sshKeyFile;
   }
 }
@@ -35,7 +36,7 @@ Function Set-HMCTSGitConfiguration {
 
   $sshKey = ssh-add -L | Select-String "richard.slater@hmcts.net";
   if (!$sshKey) {
-    $sshKeyFile = Join-Path $env:USERPROFILE "Dropbox (Personal)\SSH\richard.slater@hmcts.net-2018.rsa";
+    $sshKeyFile = Join-Path $env:USERPROFILE ".ssh\richard.slater@hmcts.net-2018.ed25519";
     ssh-add $sshKeyFile;
   }
 }
@@ -47,7 +48,7 @@ Function Set-PersonalGitConfiguration {
 
   $sshKey = ssh-add -L | Select-String "github@richard-slater.co.uk";
   if (!$sshKey) {
-    $sshKeyFile = Join-Path $env:USERPROFILE "Dropbox (Personal)\SSH\richard@richard-slater.co.uk-2016";
+    $sshKeyFile = Join-Path $env:USERPROFILE ".ssh\richard@richard-slater.co.uk-2018.ed25519";
     ssh-add $sshKeyFile;
   }
 }
