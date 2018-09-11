@@ -14,6 +14,7 @@ Function Set-GitCore {
   git config --global branch.autosetupmerge true;
   git config --global push.default simple;
   git config --global pull.rebase true;
+  git config --global commit.gpgsign true
   git config --global user.signingkey A6DA3DB0942B2D021B75F6DA973EC875A6E40B5A;
 }
 
