@@ -1,13 +1,8 @@
-$versionCache = "$PSScriptRoot\versionCache.xml"
-
-function Update-VersionInfo () {
-  $providerFiles = Get-ChildItem $PSScriptRoot -Filter 'Provider-*.ps1'
-  $providers = $providerFiles | Select-Object @{ Name='Provider'; Expression= { & $_.FullName } }
-  return $providers | Select-Object `
-    @{ Name='Name'; Expression= { $_.Provider.Name } }, `
-    @{ Name='ActiveVersion'; Expression={ & $_.Provider.ActiveVersion } }, `
-    @{ Name='LatestVersion'; Expression={ & $_.Provider.LatestVersion } }
+$dataPath = "$($env:ProgramData)\versions\"
+if (-Not (Test-Path $dataPath)) {
+  New-Item -ItemType Directory -Path $dataPath | Out-Null
 }
+$versionCache = "$dataPath\versionCache.xml"
 
 function Format-VersionTable () {
   param(
@@ -43,6 +38,16 @@ function Format-VersionTable () {
 }
 
 $updateVersionInfo = {
+  function Update-VersionInfo () {
+    $providerFiles = Get-ChildItem $PSScriptRoot -Filter 'Provider-*.ps1'
+    $providers = $providerFiles | Select-Object @{ Name='Provider'; Expression= { & $_.FullName } }
+    return $providers | Select-Object `
+      @{ Name='Name'; Expression= { $_.Provider.Name } }, `
+      @{ Name='ActiveVersion'; Expression={ & $_.Provider.ActiveVersion } }, `
+      @{ Name='LatestVersion'; Expression={ & $_.Provider.LatestVersion } }
+  }
+  
+  $versionCache = "$($env:ProgramData)/versions/versionCache.xml"
   $versionData = Update-VersionInfo
   $versionData | Export-CliXml $versionCache
   return $versionData
