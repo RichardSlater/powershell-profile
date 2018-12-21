@@ -37,34 +37,19 @@ function Format-VersionTable () {
   }
 }
 
-$updateVersionInfo = {
-  function Update-VersionInfo () {
-    $providerFiles = Get-ChildItem $PSScriptRoot -Filter 'Provider-*.ps1'
-    $providers = $providerFiles | Select-Object @{ Name='Provider'; Expression= { & $_.FullName } }
-    return $providers | Select-Object `
-      @{ Name='Name'; Expression= { $_.Provider.Name } }, `
-      @{ Name='ActiveVersion'; Expression={ & $_.Provider.ActiveVersion } }, `
-      @{ Name='LatestVersion'; Expression={ & $_.Provider.LatestVersion } }
-  }
-  
-  $versionCache = "$($env:ProgramData)/versions/versionCache.xml"
-  $versionData = Update-VersionInfo
-  $versionData | Export-CliXml $versionCache
-  return $versionData
-}
-
 $versionData = $null
 if (-Not (Test-Path ($versionCache))) {
-  $versionData = & $updateVersionInfo
+  $versionData = & "$PSScriptRoot/Update-VersionInfoScheduled.ps1"
 } else {
   $lastWrite = Get-ChildItem $versionCache -ErrorAction SilentlyContinue | Select-Object -ExpandProperty LastWriteTime
   $needsUpdate = $lastWrite -lt (Get-Date).AddHours(-1)
   $versionData = Import-CliXml $versionCache
 
-  if ($needsUpdate) {
+  if (($null -eq $versionData) -Or ($versionData.Length -eq 0)) {
+    $versionData = & "$PSScriptRoot/Update-VersionInfoScheduled.ps1"
+  } elseif ($needsUpdate) {
     Get-Job -Name "Update Version Information" -ErrorAction SilentlyContinue | Remove-Job
-    Start-Job -Name 'Update Version Information' -ScriptBlock $updateVersionInfo | Out-Null
+    Start-Job -Name 'Update Version Information' -FilePath "$PSScriptRoot\Update-VersionInfoScheduled.ps1" -ArgumentList $PSScriptRoot | Out-Null
   }
 }
-
 $versionData | Format-VersionTable
