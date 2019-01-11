@@ -1,3 +1,3 @@
 function Remove-VersionInfo () {
-  Remove-Item "$PSScriptRoot\..\currency\versionCache.xml"
+  Remove-Item "$($env:ProgramData)/versions/versionCache.xml"
 }
