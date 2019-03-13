@@ -3,8 +3,8 @@
   ActiveVersion = {
     $localDirectory = 'C:\Tools\hashicorp\'
     $activeVersion = Join-Path $localDirectory "terraform.exe"
-    $unparsedVersion = $(& $activeVersion --version) | Where-Object { -Not [String]::IsNullOrWhiteSpace($_) }
-    $isInstalled = $unparsedVersion[0] -match '\d+\.\d+\.\d+'
+    $unparsedVersion = $(& $activeVersion --version) | Where-Object { -Not [String]::IsNullOrWhiteSpace($_) } | Select-Object -First 1
+    $isInstalled = $unparsedVersion -match '\d+\.\d+\.\d+'
     if ($isInstalled) {
       return $matches[0]
     } else {
