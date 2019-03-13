@@ -12,8 +12,8 @@ Function Update-Hashicorp($Product, $Version = $null, [switch]$WhatIf) {
   $latestVersion = $updateCheck.current_version
   $targetVersion = if ($Version) { $version } else { $latestVersion }
   $activeVersion = Join-Path $localDirectory "$Product.exe"
-  $unparsedVersion = $(& $activeVersion --version)
-  $isInstalled = ($unparsedVersion | Where-Object { -Not [String]::IsNullOrWhiteSpace($_) }) -match '\d+\.\d+\.\d+'
+  $unparsedVersion = $(& $activeVersion --version) | Where-Object { -Not [String]::IsNullOrWhiteSpace($_) }
+  $isInstalled = $unparsedVersion[0] -match '\d+\.\d+\.\d+'
   $currentVersion = if ($isInstalled) { $matches[0] } else { "N/A" }
   $backupDirectory = Join-Path $localDirectory "$($Product)-$currentVersion"
   $backupExecutable = Join-Path $backupDirectory "$Product.exe"
@@ -51,11 +51,12 @@ Function Update-Hashicorp($Product, $Version = $null, [switch]$WhatIf) {
       Invoke-WebRequest -Uri $downloadUri -OutFile $downloadLocation
     }
     try {
-      if (Test-Path $backupExecutable) {
+      if (Test-Path $activeVersion) {
         Move-Item $activeVersion $backupDirectory -Force | Out-Null
       }
       Expand-Archive $downloadLocation -DestinationPath $localDirectory -Force
     } catch {
+      Write-Host $_.Exception
       if (Test-Path $backupExecutable) {
         Write-Host "Failed... rolling back..." -ForegroundColor Red -NoNewLine
         Move-Item $backupExecutable $activeVersion | Out-Null
