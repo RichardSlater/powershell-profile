@@ -12,10 +12,10 @@
   LatestVersion = {
     $oldProgress = $ProgressPreference
     $ProgressPreference = 'SilentlyContinue'
-    $updateCheck = Invoke-WebRequest https://www.python.org/downloads/
+    $updateCheck = Invoke-WebRequest -UseBasicParsing https://www.python.org/downloads/
     $ProgressPreference = $oldProgress
-    $downloadFile = $updateCheck.Links | Where-Object { $_.InnerText -ne $null -And $_.innerText.StartsWith('Python 2') } | Select-Object -First 1 -ExpandProperty innerText
-    $isInstalled = ($downloadFile | Where-Object { -Not [String]::IsNullOrWhiteSpace($_) }) -match '\d+\.\d+\.\d+'
+    $downloadFile = $updateCheck.Links | Where-Object { $_.OuterHtml.Contains('Python 2') } | Select-Object -First 1 -ExpandProperty outerHtml
+    $isInstalled = $downloadFile -match '\d+\.\d+\.\d+'
     if ($isInstalled) {
       return $matches[0]
     } else {

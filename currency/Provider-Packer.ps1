@@ -1,9 +1,7 @@
 @{
   Name = "Packer";
   ActiveVersion = {
-    $localDirectory = 'C:\Tools\hashicorp\'
-    $activeVersion = Join-Path $localDirectory "packer.exe"
-    $unparsedVersion = $(& $activeVersion --version)
+    $unparsedVersion = $(& packer --version)
     $isInstalled = ($unparsedVersion | Where-Object { -Not [String]::IsNullOrWhiteSpace($_) }) -match '\d+\.\d+\.\d+'
     if ($isInstalled) {
       return $matches[0]
