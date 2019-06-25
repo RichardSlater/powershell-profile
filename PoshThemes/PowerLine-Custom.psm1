@@ -11,11 +11,13 @@ function Write-Theme {
 
     $lastColor = $sl.Colors.PromptBackgroundColor
 
-    $prompt = Write-Prompt -Object $sl.PromptSymbols.StartSymbol -ForegroundColor $sl.Colors.AltForegroundColor -BackgroundColor $sl.Colors.AltBackgroundColor
-
     #check for elevated prompt
     If (Test-Administrator) {
+        $prompt = Write-Prompt -Object $sl.PromptSymbols.StartSymbol -ForegroundColor $sl.Colors.AdminIconForegroundColor -BackgroundColor $sl.Colors.SessionInfoBackgroundColor
         $prompt += Write-Prompt -Object "$($sl.PromptSymbols.ElevatedSymbol) " -ForegroundColor $sl.Colors.AdminIconForegroundColor -BackgroundColor $sl.Colors.SessionInfoBackgroundColor
+        $prompt += Write-Prompt -Object "$($sl.PromptSymbols.SegmentForwardSymbol) " -ForegroundColor $sl.Colors.SessionInfoBackgroundColor -BackgroundColor $sl.Colors.AltBackgroundColor
+    } else {
+        $prompt = Write-Prompt -Object $sl.PromptSymbols.StartSymbol -ForegroundColor $sl.Colors.AltForegroundColor -BackgroundColor $sl.Colors.AltBackgroundColor
     }
 
     $time = Get-Date -UFormat "%Hh%M"
@@ -53,7 +55,9 @@ function Write-Theme {
 
     #check the last command state and indicate if failed
     If ($lastCommandFailed) {
-        $prompt += Write-Prompt -Object "$($sl.PromptSymbols.FailedCommandSymbol) " -ForegroundColor $sl.Colors.CommandFailedIconForegroundColor -BackgroundColor $sl.Colors.SessionInfoBackgroundColor
+        $prompt += Write-Prompt -Object $sl.PromptSymbols.SegmentForwardSymbol -ForegroundColor $lastColor -BackgroundColor $sl.Colors.CommandFailedIconBackgroundColor
+        $prompt += Write-Prompt -Object " $($sl.PromptSymbols.FailedCommandSymbol) " -ForegroundColor $sl.Colors.CommandFailedIconForegroundColor -BackgroundColor $sl.Colors.CommandFailedIconBackgroundColor
+        $lastColor = $sl.Colors.CommandFailedIconBackgroundColor
     }
 
     # Writes the postfix to the prompt
@@ -76,3 +80,4 @@ $sl.Colors.WithForegroundColor = [ConsoleColor]::White
 $sl.Colors.WithBackgroundColor = [ConsoleColor]::DarkRed
 $sl.Colors.VirtualEnvBackgroundColor = [System.ConsoleColor]::Red
 $sl.Colors.VirtualEnvForegroundColor = [System.ConsoleColor]::White
+$sl.Colors.CommandFailedIconBackgroundColor = [System.ConsoleColor]::Red
