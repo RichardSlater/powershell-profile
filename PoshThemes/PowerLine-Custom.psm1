@@ -35,7 +35,8 @@ function Write-Theme {
     # just grab the leaf segment
     $path = $pwd | Split-Path -Leaf
     $prompt += Write-Prompt -Object "$path " -ForegroundColor $sl.Colors.SessionInfoForegroundColor -BackgroundColor $sl.Colors.SessionInfoBackgroundColor
-    
+    $lastColor = $sl.Colors.SessionInfoBackgroundColor
+
     $status = Get-VCSStatus
     if ($status) {
         $themeInfo = Get-VcsInfo -status ($status)
