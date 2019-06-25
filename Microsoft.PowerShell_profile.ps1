@@ -118,9 +118,9 @@ if (Test-Path($poshGitPath)) {
   Import-Module "$poshGitPath"
 }
 
-if ((Get-Module -ListAvailable oh-my-posh | Measure-Object).Count > 0) {
+if ((Get-Module -ListAvailable oh-my-posh | Measure-Object).Count -gt 0) {
   Import-Module oh-my-posh
-  Set-Theme Paradox
+  Set-Theme PowerLine-Custom
 }
 
 $stopwatch.Stop();
