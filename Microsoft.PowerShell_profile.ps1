@@ -1,6 +1,7 @@
 Set-StrictMode -Version Latest;
 $Global:DebugPreference = "SilentlyContinue";
 $Global:VerbosePreference = "SilentlyContinue";
+$host.ui.RawUI.WindowTitle = "PowerShell";
 
 # Configure ServicePointManager to Prefer TLS 1.2
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
@@ -15,6 +16,7 @@ $CJpegRootPath  = Join-Path $ScriptPath "cjpeg";
 $cjpegPath      = Join-Path $CJpegRootPath "cjpeg\Release\cjpeg.exe";
 $whoisPath      = Join-Path $ScriptPath "sysinternals\whois.exe";
 $logstalgiaPath = Join-Path $ScriptPath "logstalgia\logstalgia.exe";
+$BeyondCompPath = 'C:\Program Files\Beyond Compare 4\BComp.exe'
 $terraformPath  = 'C:\Tools\hashicorp\terraform.exe'
 $poshGitPath    = 'C:\tools\poshgit\dahlbyk-posh-git-9bda399\src\posh-git.psd1'
 
@@ -114,6 +116,11 @@ if (Test-Path($ChocolateyProfile)) {
 # PoshGit
 if (Test-Path($poshGitPath)) {
   Import-Module "$poshGitPath"
+}
+
+if ((Get-Module -ListAvailable oh-my-posh | Measure-Object).Count > 0) {
+  Import-Module oh-my-posh
+  Set-Theme Paradox
 }
 
 $stopwatch.Stop();
