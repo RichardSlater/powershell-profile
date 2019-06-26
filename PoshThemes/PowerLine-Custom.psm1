@@ -24,15 +24,15 @@ function Write-Theme {
     $prompt += Write-Prompt -Object "$time " -ForegroundColor $sl.Colors.AltForegroundColor -BackgroundColor $sl.Colors.AltBackgroundColor
     $prompt += Write-Prompt -Object "$($sl.PromptSymbols.SegmentForwardSymbol) " -ForegroundColor $sl.Colors.AltBackgroundColor -BackgroundColor $sl.Colors.SessionInfoBackgroundColor
 
-    $computer = [System.Environment]::MachineName
-    $prompt += Write-Prompt -Object "$computer " -ForegroundColor $sl.Colors.SessionInfoForegroundColor -BackgroundColor $sl.Colors.SessionInfoBackgroundColor
-    $prompt += Write-Prompt -Object "$($sl.PromptSymbols.SegmentForwardSymbol) " -ForegroundColor $sl.Colors.SessionInfoBackgroundColor -BackgroundColor $sl.Colors.AltBackgroundColor
-
     $user = [System.Environment]::UserName
     if (Test-NotDefaultUser($user)) {
-        $prompt += Write-Prompt -Object "$user " -ForegroundColor $sl.Colors.AltForegroundColor -BackgroundColor $sl.Colors.AltBackgroundColor
-        $prompt += Write-Prompt -Object "$($sl.PromptSymbols.SegmentForwardSymbol) " -ForegroundColor $sl.Colors.AltBackgroundColor -BackgroundColor $sl.Colors.SessionInfoBackgroundColor
+        $prompt += Write-Prompt -Object "$user " -ForegroundColor $sl.Colors.SessionInfoForegroundColor -BackgroundColor $sl.Colors.SessionInfoBackgroundColor
+        $prompt += Write-Prompt -Object "$($sl.PromptSymbols.SegmentForwardSymbol) " -ForegroundColor $sl.Colors.SessionInfoBackgroundColor -BackgroundColor $sl.Colors.AltBackgroundColor
     }
+
+    $computer = [System.Environment]::MachineName
+    $prompt += Write-Prompt -Object "$computer " -ForegroundColor $sl.Colors.AltForegroundColor -BackgroundColor $sl.Colors.AltBackgroundColor
+    $prompt += Write-Prompt -Object "$($sl.PromptSymbols.SegmentForwardSymbol) " -ForegroundColor $sl.Colors.AltBackgroundColor -BackgroundColor $sl.Colors.SessionInfoBackgroundColor
 
     # just grab the leaf segment
     $path = $pwd | Split-Path -Leaf
