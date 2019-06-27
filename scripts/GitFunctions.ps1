@@ -3,7 +3,7 @@ Function Set-GitCore {
   $env:SSH_AUTH_SOCK = $null;
   $gitIgnorePath = Join-Path $ProfilePath .gitignore;
   git config --global user.name "Richard Slater";
-  git config --global core.editor vim;
+  git config --global core.editor $VimPath.Replace("\", "/");
   git config --global color.ui true;
   git config --global core.autocrlf true;
   git config --global core.excludesfile $gitIgnorePath;
