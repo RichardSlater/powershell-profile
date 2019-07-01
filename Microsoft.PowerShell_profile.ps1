@@ -16,7 +16,6 @@ $CJpegRootPath  = Join-Path $ScriptPath "cjpeg";
 $cjpegPath      = Join-Path $CJpegRootPath "cjpeg\Release\cjpeg.exe";
 $whoisPath      = Join-Path $ScriptPath "sysinternals\whois.exe";
 $logstalgiaPath = Join-Path $ScriptPath "logstalgia\logstalgia.exe";
-$BeyondCompPath = 'C:\Program Files\Beyond Compare 4\BComp.exe'
 $terraformPath  = 'C:\Tools\hashicorp\terraform.exe'
 $poshGitPath    = 'C:\tools\poshgit\dahlbyk-posh-git-9bda399\src\posh-git.psd1'
 
