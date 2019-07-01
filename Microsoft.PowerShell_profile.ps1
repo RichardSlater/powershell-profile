@@ -16,7 +16,7 @@ $CJpegRootPath  = Join-Path $ScriptPath "cjpeg";
 $cjpegPath      = Join-Path $CJpegRootPath "cjpeg\Release\cjpeg.exe";
 $whoisPath      = Join-Path $ScriptPath "sysinternals\whois.exe";
 $logstalgiaPath = Join-Path $ScriptPath "logstalgia\logstalgia.exe";
-$terraformPath  = 'C:\Tools\hashicorp\terraform.exe'
+$terraformPath  = 'C:\choco\bin\terraform.exe'
 $poshGitPath    = 'C:\tools\poshgit\dahlbyk-posh-git-9bda399\src\posh-git.psd1'
 
 $ProfileTimings = @{};
@@ -86,9 +86,16 @@ Set-Alias cjpeg      $cjpegPath;
 Set-Alias gource     $GourcePath;
 Set-Alias whois      $whoisPath;
 Set-Alias logstalgia $logstalgiaPath;
-Set-Alias tf         $TerraformPath;
 Set-Alias ll         Get-ChildItemColor -Option AllScope;
 Set-Alias cat        Get-ContentColor -Option AllScope;
+
+# Terraform Alias'
+Function Get-TerraformPlan { & $TerraformPath plan -out .tfplan }
+Function Set-TerraformPlan { & $TerraformPath apply .tfplan }
+
+Set-Alias tf         $TerraformPath;
+Set-Alias tfp        Get-TerraformPlan;
+Set-Alias tfa        Set-TerraformPlan;
 
 if (Test-Path ~\MachineModules.ps1) {
   . ~\MachineModules.ps1;
