@@ -1,2 +1,3 @@
 modules/Microsoft.Azure.*
 currency/versionCache.xml
+bin/vim/.netrwhist
