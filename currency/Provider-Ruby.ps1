@@ -12,12 +12,12 @@
   };
   LatestVersion = {
     $updateCheck = Invoke-RestMethod -Uri "https://api.github.com/repos/oneclick/rubyinstaller2/releases"
-    $unParsedVersion = $updateCheck | Select-Object -First 1 -ExpandProperty name
-    $isInstalled = ($unparsedVersion | Where-Object { -Not [String]::IsNullOrWhiteSpace($_) }) -match '\d+\.\d+\.\d+'
-    if ($isInstalled) {
-      return $matches[0]
-    } else {
-      return "N/A"
-    }
+    $latest = $updateCheck | Select-Object -ExpandProperty name |
+      Where-Object { -Not [String]::IsNullOrWhiteSpace($_) -And $_ -match '\d+\.\d+\.\d+' } |
+      Select-Object @{l="Version";e={[Version]::Parse($_.Replace("RubyInstaller-","").Split(" ")[0].Split("-")[0])}} |
+      Sort-Object Version -Descending |
+      Select-Object -First 1
+
+    return $latest.Version.ToString()
   }
 }

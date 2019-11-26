@@ -5,12 +5,11 @@ Function Set-GitCore {
   git config --global user.name "Richard Slater";
   git config --global core.editor $VimPath.Replace("\", "/");
   git config --global color.ui true;
-  git config --global core.autocrlf true;
+  git config --global core.eol lf;
+  git config --global core.autocrlf input;
   git config --global core.excludesfile $gitIgnorePath;
   git config --global mergetool.vimdiff3.cmd 'vim -f -d -c "wincmd J" "$MERGED" "$LOCAL" "$BASE" "$REMOTE"';
   git config --global merge.tool vimdiff3;
-  git config --global diff.tool.bc4;
-  git config --global difftool.bc4.path $BeyondCompPath;
   git config --global branch.autosetupmerge true;
   git config --global push.default simple;
   git config --global pull.rebase true;
