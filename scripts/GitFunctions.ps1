@@ -14,7 +14,7 @@ Function Set-GitCore {
   git config --global push.default simple;
   git config --global pull.rebase true;
   git config --global commit.gpgsign true
-  git config --global user.signingkey A6DA3DB0942B2D021B75F6DA973EC875A6E40B5A;
+  git config --global user.signingkey AB7B45D357FB194C2E4674C21F9C9FBAB8A1DFD4;
 }
 
 # for configuring git at Amido with suitable settings
